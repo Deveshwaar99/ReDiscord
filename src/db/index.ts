@@ -1,11 +1,10 @@
-import { neon } from '@neondatabase/serverless'
-import { drizzle } from 'drizzle-orm/neon-http'
+import { Pool } from '@neondatabase/serverless'
+import { drizzle } from 'drizzle-orm/neon-serverless'
+// let dbInstance: NeonHttpDatabase<Record<string, never>>
 
-let dbInstance
-
-if (!dbInstance) {
-  const connect = neon(process.env.DATABASE_URL!)
-  dbInstance = drizzle(connect)
-}
+// if (!dbInstance) {
+const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+let dbInstance = drizzle(pool)
+// }
 
 export { dbInstance as db }

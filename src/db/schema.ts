@@ -1,4 +1,4 @@
-import { relations } from 'drizzle-orm'
+import { relations, sql } from 'drizzle-orm'
 import { pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 
 // Enums
@@ -7,7 +7,9 @@ export const ChannelType = pgEnum('channelType', ['TEXT', 'AUDIO', 'VIDEO'])
 
 // Profile Table
 export const Profile = pgTable('profile', {
-  id: text('id').primaryKey().default('uuid_generate_v4()'),
+  id: text('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   clerkId: text('clerkId').unique(),
   name: text('name'),
   imageUrl: text('imageUrl'),
@@ -20,10 +22,15 @@ export const Profile = pgTable('profile', {
 
 // Server Table
 export const Server = pgTable('server', {
-  id: text('id').primaryKey().default('uuid_generate_v4()'),
+  id: text('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   name: text('name'),
   imageUrl: text('imageUrl'),
-  inviteCode: text('inviteCode').unique().notNull(),
+  inviteCode: text('inviteCode')
+    .unique()
+    .notNull()
+    .default(sql`gen_random_uuid()`),
   profileId: text('profileId')
     .notNull()
     .references(() => Profile.id, { onDelete: 'cascade' }),
@@ -35,7 +42,9 @@ export const Server = pgTable('server', {
 
 // Member Table
 export const Member = pgTable('member', {
-  id: text('id').primaryKey().default('uuid_generate_v4()'),
+  id: text('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   role: MemberRole('role').default('GUEST'),
   profileId: text('profileId')
     .notNull()
@@ -51,7 +60,9 @@ export const Member = pgTable('member', {
 
 // Channel Relations
 export const Channel = pgTable('channel', {
-  id: text('id').primaryKey().default('uuid_generate_v4()'),
+  id: text('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   name: text('name').notNull(),
   type: ChannelType('type').default('TEXT'),
   profileId: text('profileId')
@@ -68,7 +79,9 @@ export const Channel = pgTable('channel', {
 
 // Message Table
 export const Message = pgTable('message', {
-  id: text('id').primaryKey().default('uuid_generate_v4()'),
+  id: text('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   content: text('content').notNull(),
   fileUrl: text('fileUrl'),
   memberId: text('memberId')
@@ -86,7 +99,9 @@ export const Message = pgTable('message', {
 
 // Conversation Table
 export const Conversation = pgTable('conversation', {
-  id: text('id').primaryKey().default('uuid_generate_v4()'),
+  id: text('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   memberOneId: text('memberOneId')
     .notNull()
     .references(() => Member.id, { onDelete: 'cascade' }),
@@ -101,7 +116,9 @@ export const Conversation = pgTable('conversation', {
 
 // DirectMessage Table
 export const DirectMessage = pgTable('directMessage', {
-  id: text('id').primaryKey().default('uuid_generate_v4()'),
+  id: text('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   content: text('content').notNull(),
   fileUrl: text('fileUrl'),
   memberId: text('memberId')
@@ -125,54 +142,33 @@ export const profileRelations = relations(Profile, ({ many }) => ({
 
 // Server Relations
 export const serverRelations = relations(Server, ({ one, many }) => ({
-  profile: one(Profile, {
-    fields: [Server.profileId],
-    references: [Profile.id],
-  }),
+  profile: one(Profile, { fields: [Server.profileId], references: [Profile.id] }),
   members: many(Member),
 }))
 
 // Member Relations
 export const memberRelations = relations(Member, ({ one }) => ({
-  profile: one(Profile, {
-    fields: [Member.profileId],
-    references: [Profile.id],
-  }),
-  server: one(Server, {
-    fields: [Member.serverId],
-    references: [Server.id],
-  }),
+  profile: one(Profile, { fields: [Member.profileId], references: [Profile.id] }),
+  server: one(Server, { fields: [Member.serverId], references: [Server.id] }),
 }))
 
 // Channel Relations
 export const channelRelations = relations(Channel, ({ one, many }) => ({
-  profile: one(Profile),
-  server: one(Server),
+  profile: one(Profile, { fields: [Channel.profileId], references: [Profile.id] }),
+  server: one(Server, { fields: [Channel.serverId], references: [Server.id] }),
   messages: many(Message),
 }))
 
 // Message Relations
 export const messageRelations = relations(Message, ({ one }) => ({
-  member: one(Member, {
-    fields: [Message.memberId],
-    references: [Member.id],
-  }),
-  channel: one(Channel, {
-    fields: [Message.channelId],
-    references: [Channel.id],
-  }),
+  member: one(Member, { fields: [Message.memberId], references: [Member.id] }),
+  channel: one(Channel, { fields: [Message.channelId], references: [Channel.id] }),
 }))
 
 // Conversation Relations
 export const conversationRelations = relations(Conversation, ({ one, many }) => ({
-  memberOne: one(Member, {
-    fields: [Conversation.memberOneId],
-    references: [Member.id],
-  }),
-  memberTwo: one(Member, {
-    fields: [Conversation.memberTwoId],
-    references: [Member.id],
-  }),
+  memberOne: one(Member, { fields: [Conversation.memberOneId], references: [Member.id] }),
+  memberTwo: one(Member, { fields: [Conversation.memberTwoId], references: [Member.id] }),
   directMessages: many(DirectMessage),
 }))
 
@@ -184,3 +180,5 @@ export const directMessageRelations = relations(DirectMessage, ({ one }) => ({
     references: [Conversation.id],
   }),
 }))
+
+export type SelectProfile = typeof Profile.$inferSelect
