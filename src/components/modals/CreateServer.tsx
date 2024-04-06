@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useModalStore } from '@/hooks/useModalStore'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
@@ -31,10 +32,13 @@ import { z } from 'zod'
 function CreateServerModal() {
   const [isLoading, setIsLoading] = useState(false)
 
+  const { isOpen, type, onClose } = useModalStore()
+  const isModalOpen = isOpen && type === 'create-server'
+
   const router = useRouter()
 
   const formSchema = z.object({
-    serverName: z
+    name: z
       .string()
       .min(5, {
         message: 'Server name must be between 5 to 25 characters.',
@@ -51,13 +55,14 @@ function CreateServerModal() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      serverName: '',
+      name: '',
       imageUrl: 'https://utfs.io/f/f9084c92-c855-4945-b8cb-8e9e8f663ec8-9394t8.jpg',
     },
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
+    console.log(values)
     try {
       const { data } = await axios.post('/api/servers', values)
       if (data.error) {
@@ -79,17 +84,16 @@ function CreateServerModal() {
 
   function handleClose() {
     form.reset()
+    onClose()
   }
 
   return (
-    <Dialog>
-      <DialogTrigger>Open</DialogTrigger>
-
-      <DialogOverlay className="bg-[#1e1f22]" />
-      <DialogContent className="w-[440px] overflow-hidden border-none bg-[#313338] p-0 text-white">
+    <Dialog open={isModalOpen} onOpenChange={handleClose}>
+      <DialogOverlay className="bg-transparent" />
+      <DialogContent className="w-[440px] overflow-hidden border-none bg-white p-0 text-primary dark:bg-[#313338]">
         <DialogHeader className="px-6 pt-8">
           <DialogTitle className="text-center text-2xl font-bold">Create your Server</DialogTitle>
-          <DialogDescription className="text-balance text-center text-gray-400">
+          <DialogDescription className="text-balance text-center text-zinc-500 dark:text-gray-400">
             Give youe new server a personality with a name and an icon.You can always change it
             later
           </DialogDescription>
@@ -116,15 +120,15 @@ function CreateServerModal() {
               </div>
               <FormField
                 control={form.control}
-                name="serverName"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-bold uppercase text-[#b5bac1]">
+                    <FormLabel className="text-xs font-bold uppercase text-zinc-500 dark:text-[#b5bac1]">
                       SERVER NAME
                     </FormLabel>
                     <FormControl>
                       <Input
-                        className="border-0 bg-[#1e1f22] text-[#dbdee1] focus-visible:ring-0 focus-visible:ring-offset-0"
+                        className="border-0 bg-zinc-300/50 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-[#1e1f22] dark:text-[#dbdee1]"
                         placeholder="My server"
                         {...field}
                       />
