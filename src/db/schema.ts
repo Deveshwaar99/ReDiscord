@@ -1,5 +1,5 @@
 import { relations, sql } from 'drizzle-orm'
-import { pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
 
 // Enums
 export const MemberRole = pgEnum('memberRole', ['ADMIN', 'MODERATOR', 'GUEST'])
@@ -25,8 +25,8 @@ export const Server = pgTable('server', {
   id: text('id')
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  name: text('name'),
-  imageUrl: text('imageUrl'),
+  name: text('name').notNull(),
+  imageUrl: text('imageUrl').notNull(),
   inviteCode: text('inviteCode')
     .unique()
     .notNull()
