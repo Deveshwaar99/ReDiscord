@@ -72,6 +72,7 @@ function CreateServerModal() {
       toast.success('Server Created')
       console.log('server created successfully')
       form.reset()
+      onClose()
       router.refresh()
       window.location.reload()
     } catch (error) {
