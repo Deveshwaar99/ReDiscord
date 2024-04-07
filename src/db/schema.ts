@@ -144,6 +144,7 @@ export const profileRelations = relations(Profile, ({ many }) => ({
 export const serverRelations = relations(Server, ({ one, many }) => ({
   profile: one(Profile, { fields: [Server.profileId], references: [Profile.id] }),
   members: many(Member),
+  channels: many(Channel),
 }))
 
 // Member Relations
