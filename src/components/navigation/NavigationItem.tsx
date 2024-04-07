@@ -1,10 +1,9 @@
 'use client'
 
-import React from 'react'
 import ActionTooltip from '@/components/ActionTooltip'
-import { useParams, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
+import { useParams, useRouter } from 'next/navigation'
 
 interface NavigationItemProps {
   id: string

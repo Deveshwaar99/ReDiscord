@@ -1,8 +1,7 @@
 'use client'
-import React from 'react'
 import ActionTooltip from '@/components/ActionTooltip'
-import { Plus } from 'lucide-react'
 import { useModalStore } from '@/hooks/useModalStore'
+import { Plus } from 'lucide-react'
 
 function NavigiationAction() {
   const { onOpen } = useModalStore()
