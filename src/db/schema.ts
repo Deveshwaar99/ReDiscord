@@ -45,7 +45,7 @@ export const Member = pgTable('member', {
   id: text('id')
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  role: MemberRole('role').default('GUEST'),
+  role: MemberRole('role').default('GUEST').notNull(),
   profileId: text('profileId')
     .notNull()
     .references(() => Profile.id, { onDelete: 'cascade' }),
@@ -183,3 +183,6 @@ export const directMessageRelations = relations(DirectMessage, ({ one }) => ({
 }))
 
 export type SelectProfile = typeof Profile.$inferSelect
+export type SelectServer = typeof Server.$inferSelect
+export type SelectMember = typeof Member.$inferSelect
+export type SelectChannel = typeof Channel.$inferSelect
