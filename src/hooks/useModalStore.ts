@@ -1,19 +1,29 @@
+import { SelectServer } from '@/db/schema'
 import { create } from 'zustand'
-type ModalType = 'create-server'
+type ModalType = 'create-server' | 'invite'
+
+interface ModalData {
+  server?: SelectServer
+}
+
 interface ModalStore {
   type: ModalType | null
+  data: ModalData
   isOpen: boolean
-  onOpen: (modalType: ModalType) => void
+  onOpen: (modalType: ModalType, modalData: ModalData) => void
   onClose: () => void
 }
 
 export const useModalStore = create<ModalStore>()(set => ({
   type: null,
+  data: {},
   isOpen: false,
-  onOpen: modalType =>
+  onOpen: (modalType, modalData = {}) => {
     set(() => ({
       type: modalType,
       isOpen: true,
-    })),
-  onClose: () => set(() => ({ type: null, isOpen: false })),
+      data: modalData,
+    }))
+  },
+  onClose: () => set(() => ({ type: null, isOpen: false, data: {} })),
 }))
