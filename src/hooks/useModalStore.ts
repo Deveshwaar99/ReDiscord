@@ -1,6 +1,6 @@
 import { SelectServer } from '@/db/schema'
 import { create } from 'zustand'
-type ModalType = 'create-server' | 'invite'
+type ModalType = 'create-server' | 'invite' | 'edit-server'
 
 interface ModalData {
   server?: SelectServer

@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import CreateServerModal from '../modals/CreateServer'
+import EditServerModal from '../modals/EditServer'
 import InviteUserModal from '../modals/InviteUser'
 
 function ModalProvider() {
@@ -15,6 +16,7 @@ function ModalProvider() {
   return (
     <>
       <CreateServerModal />
+      <EditServerModal />
       <InviteUserModal />
     </>
   )
