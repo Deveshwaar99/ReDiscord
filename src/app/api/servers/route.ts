@@ -6,13 +6,14 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function POST(req: NextRequest) {
   try {
     const { name, imageUrl } = await req.json()
-    if (!name || !imageUrl) {
-      return NextResponse.json({ error: 'Name and imageUrl are required' }, { status: 400 })
-    }
 
     const profile = await getProfile()
     if (!profile) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    if (!name || !imageUrl) {
+      return NextResponse.json({ error: 'Name and imageUrl are required' }, { status: 400 })
     }
 
     const createServerResult = await db.transaction(async tx => {
