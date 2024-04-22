@@ -1,19 +1,14 @@
 'use client'
-import { SelectChannel, SelectMember, SelectProfile, SelectServer } from '@/db/schema'
-import { useModalStore } from '@/hooks/useModalStore'
-import { ChevronDown, LogOut, PlusCircle, Settings, Trash, UserPlus, Users } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu'
-
-type ServerWithMemberAndProfile = SelectServer & {
-  members: (SelectMember & { profile: SelectProfile })[]
-  channels: SelectChannel[]
-}
+} from '@/components/ui/dropdown-menu'
+import { useModalStore } from '@/hooks/useModalStore'
+import { ChevronDown, LogOut, PlusCircle, Settings, Trash, UserPlus, Users } from 'lucide-react'
+import { ServerWithMemberAndProfile } from '../../../types'
 
 interface ServerSidebarHeaderProps {
   server: ServerWithMemberAndProfile
@@ -60,7 +55,12 @@ function ServerSidebarHeader({ server, role }: ServerSidebarHeaderProps) {
           </DropdownMenuItem>
         )}
         {isAdmin && (
-          <DropdownMenuItem onClick={() => {}} className="cursor-pointer px-3 py-2 text-sm">
+          <DropdownMenuItem
+            onClick={() => {
+              onOpen('manage-members', { server })
+            }}
+            className="cursor-pointer px-3 py-2 text-sm"
+          >
             Manage Members
             <Users className="ml-auto h-4 w-4" />
           </DropdownMenuItem>

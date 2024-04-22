@@ -18,7 +18,7 @@ async function InvitePage({ params }: { params: { inviteCode: string } }) {
     where: (Server, { eq }) => and(eq(Server.inviteCode, inviteCode)),
     with: {
       members: {
-        where: (members, { eq }) => eq(members.profileId, 'profile.id'),
+        where: (members, { eq }) => eq(members.profileId, profile.id),
       },
     },
   })
