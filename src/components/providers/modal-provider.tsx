@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import CreateChannel from '../modals/CreateChannel'
 import CreateServerModal from '../modals/CreateServer'
 import EditServerModal from '../modals/EditServer'
 import InviteUserModal from '../modals/InviteUser'
@@ -20,6 +21,7 @@ function ModalProvider() {
       <EditServerModal />
       <InviteUserModal />
       <ManageMembersModal />
+      <CreateChannel />
     </>
   )
 }
