@@ -69,7 +69,7 @@ function ServerSidebarHeader({ server, role }: ServerSidebarHeaderProps) {
         {isModerator && (
           <DropdownMenuItem
             onClick={() => {
-              onOpen('create-channel', {})
+              onOpen('create-channel', { server })
             }}
             className="cursor-pointer px-3 py-2 text-sm"
           >

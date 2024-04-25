@@ -34,11 +34,14 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { ChannelType } from '@/db/schema'
+import axios from 'axios'
+import toast from 'react-hot-toast'
 
 function CreateServerModal() {
   const [isLoading, setIsLoading] = useState(false)
 
-  const { isOpen, type, onClose } = useModalStore()
+  const { isOpen, type, onClose, data } = useModalStore()
+  const { server } = data
   const isModalOpen = isOpen && type === 'create-channel'
 
   const router = useRouter()
@@ -66,24 +69,19 @@ function CreateServerModal() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
     console.log(values)
-    // try {
-    //   const { data } = await axios.post('/api/servers', values)
-    //   if (data.error) {
-    //     toast.error(data.error)
-    //     return console.error(data.error)
-    //   }
-    //   toast.success('Channel Created')
-
-    //   form.reset()
-    //   onClose()
-    //   router.refresh()
-    //   window.location.reload()
-    // } catch (error) {
-    //   toast.error('Unable to create Channel!')
-    //   console.error(error)
-    // } finally {
-    //   setIsLoading(false)
-    // }
+    try {
+      await axios.post(`/api/servers/${server?.id}/channels`, values)
+      toast.success('Channel Created')
+      form.reset()
+      onClose()
+      router.refresh()
+      window.location.reload()
+    } catch (error) {
+      toast.error('Unable to create Channel!')
+      console.error(error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   function handleClose() {
