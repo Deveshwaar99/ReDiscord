@@ -5,7 +5,7 @@ import { and, eq, exists, or } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
-const requestSchema = z.object({
+const validateChannelData = z.object({
   name: z
     .string()
     .min(5)
@@ -19,7 +19,7 @@ const requestSchema = z.object({
 export async function POST(req: NextRequest, { params }: { params: { serverId: string } }) {
   try {
     const requestData = await req.json()
-    const validatedData = requestSchema.parse(requestData)
+    const validatedData = validateChannelData.parse(requestData)
 
     // Access the validated data
     const { name, type } = validatedData
@@ -27,10 +27,6 @@ export async function POST(req: NextRequest, { params }: { params: { serverId: s
     const profile = await getProfile()
     if (!profile) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    if (!name || !type) {
-      return NextResponse.json({ error: 'Name and type are required' }, { status: 400 })
     }
 
     //Verify the member in the server
@@ -43,21 +39,21 @@ export async function POST(req: NextRequest, { params }: { params: { serverId: s
           or(eq(Member.role, 'ADMIN'), eq(Member.role, 'MODERATOR'))
         )
       )
-    const [server] = await db
+    const [foundServer] = await db
       .select()
       .from(Server)
       .where(and(eq(Server.id, params.serverId), exists(memberSql)))
 
-    if (!server) {
+    if (!foundServer) {
       return NextResponse.json({ error: 'Resource not found' }, { status: 404 })
     }
-    //Create the channel
-    const [channel] = await db
+
+    const [createdChannel] = await db
       .insert(Channel)
       .values({ name, type, serverId: params.serverId, profileId: profile.id })
       .returning()
 
-    return NextResponse.json(channel)
+    return NextResponse.json(createdChannel)
   } catch (error) {
     if (error instanceof z.ZodError) {
       // Handle validation errors
