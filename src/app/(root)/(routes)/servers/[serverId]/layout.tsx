@@ -1,7 +1,9 @@
 import ServerSidebar from '@/components/server/ServerSidebar'
 import { db } from '@/db'
+import { Member } from '@/db/schema'
 import { getProfile } from '@/lib/getProfile'
 import { redirectToSignIn } from '@clerk/nextjs'
+import { eq } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 
 async function ServerLayout({
@@ -14,14 +16,13 @@ async function ServerLayout({
   const profile = await getProfile()
   if (!profile) return redirectToSignIn()
 
+  const memberSql = db.select().from(Member).where(eq(Member.profileId, profile.id))
+
   const server = await db.query.Server.findFirst({
-    where: (Server, { eq }) => eq(Server.id, params.serverId),
-    with: {
-      members: {
-        where: (members, { eq }) => eq(members.profileId, profile.id),
-      },
-    },
+    where: (Server, { eq, and, exists }) => and(eq(Server.id, params.serverId), exists(memberSql)),
+    with: { members: true },
   })
+
   if (!server) redirect('/')
 
   return (
