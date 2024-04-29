@@ -92,7 +92,9 @@ function ServerSidebarHeader({ server, role }: ServerSidebarHeaderProps) {
 
         {!isAdmin && (
           <DropdownMenuItem
-            onClick={() => {}}
+            onClick={() => {
+              onOpen('leave-server', { server })
+            }}
             className="cursor-pointer px-3 py-2 text-sm text-rose-500"
           >
             Leave Server
