@@ -26,11 +26,16 @@ export async function DELETE(req: NextRequest, { params }: { params: { serverId:
     }
 
     //Delete the Member
-    await db
+    const [deletedMember] = await db
       .delete(Member)
       .where(and(eq(Member.serverId, params.serverId), eq(Member.profileId, profile.id)))
+      .returning()
 
-    return NextResponse.json({ message: 'success' })
+    if (!deletedMember) {
+      return NextResponse.json({ error: 'Failed to leave server' }, { status: 500 })
+    }
+
+    return NextResponse.json({ message: 'Left server successfully' })
   } catch (error) {
     console.error(`--Error in leave Server--`, error)
     return NextResponse.json({ error: 'Internal Error' }, { status: 500 })
