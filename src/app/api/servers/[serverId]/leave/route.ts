@@ -11,6 +11,10 @@ export async function DELETE(req: NextRequest, { params }: { params: { serverId:
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    if (!params.serverId) {
+      return NextResponse.json({ error: 'Server id is missing' }, { status: 400 })
+    }
+
     const memberSql = db.select().from(Member).where(eq(Member.profileId, profile.id))
 
     //Get matching server with mamber & and confirm its not the admin
