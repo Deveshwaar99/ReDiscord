@@ -32,8 +32,8 @@ function LeaveServerModal() {
         icon: '📤',
       })
       onClose()
-      router.refresh()
       router.push('/')
+      router.refresh()
     } catch (error) {
       toast.error('Failed to leave the server. Please try again.')
       console.error('--Leave Server Error--')
@@ -48,13 +48,13 @@ function LeaveServerModal() {
       <DialogContent className="w-[440px] overflow-hidden border-none bg-white p-0 text-primary dark:bg-[#313338]">
         <DialogHeader className="px-6 pt-8">
           <DialogTitle className="text-center text-2xl font-bold">Leave Server</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-center">
             Are you sure you want to leave{' '}
             <span className="font-semibold text-indigo-500">{server?.name}</span>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <div className="m-2 flex w-full items-center justify-between">
+          <div className="mx-4 my-3 flex w-full items-center justify-between">
             <Button disabled={isLoading} onClick={() => onClose()} variant="ghost">
               Cancel
             </Button>
