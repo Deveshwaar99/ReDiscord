@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import CreateChannel from '../modals/CreateChannel'
 import CreateServerModal from '../modals/CreateServer'
+import DeleteServerModal from '../modals/DeleteServer'
 import EditServerModal from '../modals/EditServer'
 import InviteUserModal from '../modals/InviteUser'
 import LeaveServerModal from '../modals/LeaveServer'
@@ -24,6 +25,7 @@ function ModalProvider() {
       <ManageMembersModal />
       <CreateChannel />
       <LeaveServerModal />
+      <DeleteServerModal />
     </>
   )
 }

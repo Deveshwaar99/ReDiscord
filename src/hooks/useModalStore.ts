@@ -7,6 +7,7 @@ type ModalType =
   | 'manage-members'
   | 'create-channel'
   | 'leave-server'
+  | 'delete-server'
 
 interface ModalData {
   server?: SelectServer
