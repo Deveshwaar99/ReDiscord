@@ -45,7 +45,7 @@ function LeaveServerModal() {
   return (
     <Dialog open={isModalOpen} onOpenChange={() => onClose()}>
       <DialogOverlay className="bg-transparent" />
-      <DialogContent className="w-[440px] overflow-hidden border-none bg-white p-0 text-primary dark:bg-[#313338]">
+      <DialogContent className="overflow-hidden border-none bg-white p-0 text-primary dark:bg-[#313338]">
         <DialogHeader className="px-6 pt-8">
           <DialogTitle className="text-center text-2xl font-bold">Leave Server</DialogTitle>
           <DialogDescription className="text-center">
@@ -53,8 +53,8 @@ function LeaveServerModal() {
             <span className="font-semibold text-indigo-500">{server?.name}</span>
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter>
-          <div className="mx-4 my-3 flex w-full items-center justify-between">
+        <DialogFooter className="mt-2 bg-gray-100 px-6 py-4 dark:bg-inherit">
+          <div className="flex w-full items-center justify-between">
             <Button disabled={isLoading} onClick={() => onClose()} variant="ghost">
               Cancel
             </Button>
@@ -63,7 +63,7 @@ function LeaveServerModal() {
               onClick={() => {
                 handleLeaveServer()
               }}
-              variant="default"
+              variant="primary"
             >
               Confirm
             </Button>
