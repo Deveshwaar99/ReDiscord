@@ -10,6 +10,11 @@ export async function DELETE(req: Request, { params }: { params: { serverId: str
     if (!profile) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    if (!params.serverId) {
+      return NextResponse.json({ error: 'Server Id is missing' }, { status: 400 })
+    }
+
     const [deletedServer] = await db
       .delete(Server)
       .where(and(eq(Server.id, params.serverId), eq(Server.profileId, profile.id)))
