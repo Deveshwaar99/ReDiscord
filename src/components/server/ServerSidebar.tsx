@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { ChannelTypes, MemberRoles } from '../../../types'
 import { ScrollArea } from '../ui/scroll-area'
 import { Separator } from '../ui/separator'
+import ServerChannel from './ServerChannel'
 import ServerSearch from './ServerSearch'
 import ServerSection from './ServerSection'
 import ServerSidebarHeader from './ServerSidebarHeader'
@@ -62,6 +63,7 @@ async function ServerSidebar({ serverId }: ServerSidebarProps) {
       <ServerSidebarHeader server={server} role={role} />
       <ScrollArea className="flex-1 px-3">
         <div className="mt-2">
+          {/* add a search option  */}
           <ServerSearch
             data={[
               {
@@ -103,6 +105,23 @@ async function ServerSidebar({ serverId }: ServerSidebarProps) {
             ]}
           />
         </div>
+        <Separator className="my-2 rounded-md bg-zinc-200 dark:bg-zinc-700" />
+        {!!textChannels.length && (
+          //Display a Channel Header with a create Channel button
+          <div className="mb-2">
+            <ServerSection
+              sectionType="channels"
+              channelType="TEXT"
+              role={role}
+              label="Text Channels"
+              server={server}
+            />
+            {/* List the available TEXT channels */}
+            {textChannels.map(channel => (
+              <ServerChannel key={channel.id} channel={channel} Server={server} role={role} />
+            ))}
+          </div>
+        )}
       </ScrollArea>
     </div>
   )
