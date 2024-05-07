@@ -138,6 +138,22 @@ async function ServerSidebar({ serverId }: ServerSidebarProps) {
             ))}
           </div>
         )}
+        {!!videoChannels.length && (
+          //Display a Channel Header with a create Channel button
+          <div className="mb-2">
+            <ServerSection
+              sectionType="channels"
+              channelType="VIDEO"
+              role={role}
+              label="Video Channels"
+              server={server}
+            />
+            {/* List the available VIDEO channels */}
+            {videoChannels.map(channel => (
+              <ServerChannel key={channel.id} channel={channel} Server={server} role={role} />
+            ))}
+          </div>
+        )}
       </ScrollArea>
     </div>
   )
