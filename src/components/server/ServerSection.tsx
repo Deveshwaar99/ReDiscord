@@ -1,3 +1,4 @@
+'use client'
 import { useModalStore } from '@/hooks/useModalStore'
 import { Plus, Settings } from 'lucide-react'
 import { ChannelTypes, MemberRoles, ServerWithMemberAndProfile } from '../../../types'
