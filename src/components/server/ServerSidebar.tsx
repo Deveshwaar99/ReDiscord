@@ -132,7 +132,7 @@ async function ServerSidebar({ serverId }: ServerSidebarProps) {
               label="Voice Channels"
               server={server}
             />
-            {/* List the available TEXT channels */}
+            {/* List the available AUDIO channels */}
             {audioChannels.map(channel => (
               <ServerChannel key={channel.id} channel={channel} Server={server} role={role} />
             ))}
