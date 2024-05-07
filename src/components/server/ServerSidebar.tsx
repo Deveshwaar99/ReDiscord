@@ -122,6 +122,22 @@ async function ServerSidebar({ serverId }: ServerSidebarProps) {
             ))}
           </div>
         )}
+        {!!audioChannels.length && (
+          //Display a Channel Header with a create Channel button
+          <div className="mb-2">
+            <ServerSection
+              sectionType="channels"
+              channelType="AUDIO"
+              role={role}
+              label="Voice Channels"
+              server={server}
+            />
+            {/* List the available TEXT channels */}
+            {audioChannels.map(channel => (
+              <ServerChannel key={channel.id} channel={channel} Server={server} role={role} />
+            ))}
+          </div>
+        )}
       </ScrollArea>
     </div>
   )
