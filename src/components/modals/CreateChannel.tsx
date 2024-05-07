@@ -37,7 +37,7 @@ import { ChannelType } from '@/db/schema'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
-function CreateServerModal() {
+function CreateChannelModal() {
   const [isLoading, setIsLoading] = useState(false)
 
   const { isOpen, type, onClose, data } = useModalStore()
@@ -159,4 +159,4 @@ function CreateServerModal() {
   )
 }
 
-export default CreateServerModal
+export default CreateChannelModal
