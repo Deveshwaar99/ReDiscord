@@ -7,7 +7,7 @@ import { db } from '@/db'
 import { Member, Server } from '@/db/schema'
 import { getProfile } from '@/lib/getProfile'
 import { UserButton, redirectToSignIn } from '@clerk/nextjs'
-import { and, eq, exists, ne } from 'drizzle-orm'
+import { and, asc, eq, exists, ne } from 'drizzle-orm'
 
 async function NavigationSidebar() {
   const profile = await getProfile()
@@ -16,6 +16,7 @@ async function NavigationSidebar() {
   }
   const ownedServers = await db.query.Server.findMany({
     where: eq(Server.profileId, profile.id),
+    orderBy: (Server, { asc }) => [asc(Server.createdAt)],
   })
 
   const memberSq = db
@@ -27,6 +28,7 @@ async function NavigationSidebar() {
     .select()
     .from(Server)
     .where(and(ne(Server.profileId, profile.id), exists(memberSq)))
+    .orderBy(asc(Server.createdAt))
 
   const servers = [...ownedServers, ...memberServers]
 
