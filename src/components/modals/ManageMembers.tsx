@@ -36,8 +36,6 @@ const roleIconMap = {
   ADMIN: <ShieldAlert className="h-4 w-4 text-rose-500" />,
 }
 
-export const dynamic = 'force-dynamic'
-
 function ManageMembersModal() {
   const router = useRouter()
 
