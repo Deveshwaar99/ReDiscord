@@ -73,7 +73,6 @@ function CreateServerModal() {
       form.reset()
       onClose()
       router.refresh()
-      window.location.reload()
     } catch (error) {
       toast.error('Unable to create Server!')
       console.error(error)
