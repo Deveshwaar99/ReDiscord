@@ -82,7 +82,6 @@ function EditServerModal() {
       form.reset()
       onClose()
       router.refresh()
-      window.location.reload()
     } catch (error) {
       console.error('Edit server Error--', error)
       toast.error('Somthing went wrong')
