@@ -75,7 +75,6 @@ function CreateServerModal() {
       form.reset()
       onClose()
       router.refresh()
-      window.location.reload()
     } catch (error) {
       toast.error('Unable to create Channel!')
       console.error(error)
