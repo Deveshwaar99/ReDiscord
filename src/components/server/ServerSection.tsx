@@ -17,6 +17,7 @@ function ServerSection({ label, sectionType, channelType, role, server }: Server
   return (
     <div className="flex items-center justify-between py-2">
       <p className="text-xs font-semibold uppercase text-zinc-500 dark:text-zinc-400">{label}</p>
+
       {role !== 'GUEST' && sectionType === 'channels' && (
         <ActionTooltip label="Create Channel" side="top">
           <button
@@ -29,8 +30,9 @@ function ServerSection({ label, sectionType, channelType, role, server }: Server
           </button>
         </ActionTooltip>
       )}
-      {role !== 'ADMIN' && sectionType === 'members' && (
-        <ActionTooltip label="Create Channel" side="top">
+
+      {role === 'ADMIN' && sectionType === 'members' && (
+        <ActionTooltip label="Manage Members" side="top">
           <button
             onClick={() => {
               onOpen('manage-members', { server })
