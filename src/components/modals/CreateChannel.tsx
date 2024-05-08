@@ -20,7 +20,7 @@ import { Input } from '@/components/ui/input'
 import { useModalStore } from '@/hooks/useModalStore'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -41,7 +41,7 @@ function CreateChannelModal() {
   const [isLoading, setIsLoading] = useState(false)
 
   const { isOpen, type, onClose, data } = useModalStore()
-  const { server } = data
+  const { server, channelType } = data
   const isModalOpen = isOpen && type === 'create-channel'
 
   const router = useRouter()
@@ -65,6 +65,14 @@ function CreateChannelModal() {
       name: '',
     },
   })
+
+  useEffect(() => {
+    if (channelType !== undefined) {
+      form.setValue('type', channelType)
+    } else {
+      form.resetField('type')
+    }
+  }, [form, channelType])
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
@@ -123,7 +131,7 @@ function CreateChannelModal() {
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <Select disabled={isLoading} onValueChange={field.onChange}>
+                    <Select disabled={isLoading} onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger className="border-0 bg-zinc-300/50 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-[#1e1f22] dark:text-[#dbdee1]">
                         <SelectValue placeholder="Select a channel type" />
                       </SelectTrigger>

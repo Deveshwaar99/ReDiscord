@@ -21,7 +21,7 @@ function ServerSection({ label, sectionType, channelType, role, server }: Server
         <ActionTooltip label="Create Channel" side="top">
           <button
             onClick={() => {
-              onOpen('create-channel', { server })
+              onOpen('create-channel', { server, channelType: channelType })
             }}
             className="text-zinc-500 transition hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300"
           >
