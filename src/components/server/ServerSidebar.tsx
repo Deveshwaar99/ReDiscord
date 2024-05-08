@@ -117,9 +117,11 @@ async function ServerSidebar({ serverId }: ServerSidebarProps) {
               server={server}
             />
             {/* List the available TEXT channels */}
+            <div className="space-y-2">
             {textChannels.map(channel => (
               <ServerChannel key={channel.id} channel={channel} Server={server} role={role} />
             ))}
+            </div>
           </div>
         )}
         {!!audioChannels.length && (
@@ -133,9 +135,11 @@ async function ServerSidebar({ serverId }: ServerSidebarProps) {
               server={server}
             />
             {/* List the available AUDIO channels */}
+            <div className="space-y-2">
             {audioChannels.map(channel => (
               <ServerChannel key={channel.id} channel={channel} Server={server} role={role} />
             ))}
+            </div>
           </div>
         )}
         {!!videoChannels.length && (
@@ -149,9 +153,13 @@ async function ServerSidebar({ serverId }: ServerSidebarProps) {
               server={server}
             />
             {/* List the available VIDEO channels */}
+            <div className="space-y-2">
             {videoChannels.map(channel => (
               <ServerChannel key={channel.id} channel={channel} Server={server} role={role} />
             ))}
+            </div>
+          </div>
+        )}
           </div>
         )}
       </ScrollArea>
