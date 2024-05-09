@@ -37,6 +37,7 @@
     "react-dom": "^18",
     "react-hook-form": "^7.51.2",
     "react-hot-toast": "^2.4.1",
+    "server-only": "^0.0.1",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
     "uploadthing": "^6.7.0",
