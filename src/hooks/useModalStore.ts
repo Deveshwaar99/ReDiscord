@@ -1,6 +1,7 @@
-import { SelectServer } from '@/db/schema'
+import { SelectChannel, SelectServer } from '@/db/schema'
 import { create } from 'zustand'
 import { ChannelTypes } from '../../types'
+
 type ModalType =
   | 'create-server'
   | 'invite'
@@ -9,9 +10,11 @@ type ModalType =
   | 'create-channel'
   | 'leave-server'
   | 'delete-server'
+  | 'delete-channel'
 
 interface ModalData {
   server?: SelectServer
+  channel?: SelectChannel
   channelType?: ChannelTypes
 }
 
