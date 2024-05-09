@@ -109,7 +109,7 @@ async function ServerSidebar({ serverId }: ServerSidebarProps) {
             {/* List the available TEXT channels */}
             <div className="space-y-2">
               {textChannels.map(channel => (
-                <ServerChannel key={channel.id} channel={channel} Server={server} role={role} />
+                <ServerChannel key={channel.id} channel={channel} server={server} role={role} />
               ))}
             </div>
           </div>
@@ -128,7 +128,7 @@ async function ServerSidebar({ serverId }: ServerSidebarProps) {
             {/* List the available AUDIO channels */}
             <div className="space-y-2">
               {audioChannels.map(channel => (
-                <ServerChannel key={channel.id} channel={channel} Server={server} role={role} />
+                <ServerChannel key={channel.id} channel={channel} server={server} role={role} />
               ))}
             </div>
           </div>
@@ -147,7 +147,7 @@ async function ServerSidebar({ serverId }: ServerSidebarProps) {
             {/* List the available VIDEO channels */}
             <div className="space-y-2">
               {videoChannels.map(channel => (
-                <ServerChannel key={channel.id} channel={channel} Server={server} role={role} />
+                <ServerChannel key={channel.id} channel={channel} server={server} role={role} />
               ))}
             </div>
           </div>

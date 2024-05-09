@@ -9,7 +9,7 @@ import ActionTooltip from '../ActionTooltip'
 
 type ServerChannelProps = {
   channel: SelectChannel
-  Server: SelectServer
+  server: SelectServer
   role?: MemberRoles
 }
 
@@ -19,7 +19,7 @@ const iconMap: { [key in ChannelTypes]: LucideIcon } = {
   VIDEO: Video,
 } as const
 
-function ServerChannel({ channel, Server, role }: ServerChannelProps) {
+function ServerChannel({ channel, server, role }: ServerChannelProps) {
   const params = useParams()
 
   const Icon = iconMap[channel.type]
