@@ -1,5 +1,5 @@
-import { db } from '@/db'
 import { getProfile } from '@/lib/getProfile'
+import { getServerWithMembersAndChannels } from '@/lib/getServerData'
 import { Hash, Mic, ShieldAlert, ShieldCheck, Video } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { ChannelTypes, MemberRoles } from '../../../types'
@@ -34,20 +34,7 @@ async function ServerSidebar({ serverId }: ServerSidebarProps) {
     return redirect('/')
   }
 
-  const server = await db.query.Server.findFirst({
-    where: (Server, { eq }) => eq(Server.id, serverId),
-    with: {
-      channels: {
-        orderBy: (channels, { asc }) => [asc(channels.createdAt)],
-      },
-      members: {
-        with: {
-          profile: true,
-        },
-        orderBy: (members, { asc }) => [asc(members.role)],
-      },
-    },
-  })
+  const server = await getServerWithMembersAndChannels(serverId)
 
   if (!server) {
     return redirect('/')
@@ -106,7 +93,9 @@ async function ServerSidebar({ serverId }: ServerSidebarProps) {
             ]}
           />
         </div>
+
         <Separator className="my-2 rounded-md bg-zinc-200 dark:bg-zinc-700" />
+
         {!!textChannels.length && (
           //Display a Channel Header with a create Channel button
           <div className="mb-2">
@@ -125,6 +114,7 @@ async function ServerSidebar({ serverId }: ServerSidebarProps) {
             </div>
           </div>
         )}
+
         {!!audioChannels.length && (
           //Display a Channel Header with a create Channel button
           <div className="mb-2">
@@ -143,6 +133,7 @@ async function ServerSidebar({ serverId }: ServerSidebarProps) {
             </div>
           </div>
         )}
+
         {!!videoChannels.length && (
           //Display a Channel Header with a create Channel button
           <div className="mb-2">
@@ -161,6 +152,7 @@ async function ServerSidebar({ serverId }: ServerSidebarProps) {
             </div>
           </div>
         )}
+
         {!!members.length && (
           <div className="mb-2">
             {/*  MEMBER Header with Manage Members button */}
