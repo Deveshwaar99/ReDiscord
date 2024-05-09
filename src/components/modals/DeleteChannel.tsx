@@ -31,12 +31,12 @@ function DeleteChannelModal() {
       await axios.delete(`/api/servers/${server?.id}/channels/${channel?.id}`)
       toast(`You have deleted #${channel?.name}`, { icon: '🗑️' })
       onClose()
-      router.refresh()
     } catch (error) {
       toast.error('Failed to delete channel. Please try again.')
       console.error('--Delete Channel Error--')
     } finally {
       setIsLoading(false)
+      router.refresh()
     }
   }
 
