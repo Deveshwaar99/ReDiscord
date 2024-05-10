@@ -1,11 +1,18 @@
 import { db } from '@/db'
 import { Channel, Member, Server } from '@/db/schema'
 import { getProfile } from '@/lib/getProfile'
+import { verifyServerData } from '@/lib/utils'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, imageUrl } = await req.json()
+    const requestData = await req.json()
+    const validatedData = verifyServerData(requestData)
+    if (!validatedData.success) {
+      return NextResponse.json({ error: 'Invalid input data' }, { status: 400 })
+    }
+
+    const { name, imageUrl } = validatedData.data
 
     const profile = await getProfile()
     if (!profile) {
