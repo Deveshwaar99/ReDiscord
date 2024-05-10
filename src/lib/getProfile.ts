@@ -1,5 +1,7 @@
+import 'server-only'
+
 import { db } from '@/db/index'
-import { Profile, Server } from '@/db/schema'
+import { Profile } from '@/db/schema'
 import { auth } from '@clerk/nextjs'
 import { eq } from 'drizzle-orm'
 

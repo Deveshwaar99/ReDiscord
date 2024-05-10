@@ -1,3 +1,5 @@
+import 'server-only'
+
 import { db } from '@/db'
 import { Profile, SelectProfile } from '@/db/schema'
 import { currentUser, redirectToSignIn } from '@clerk/nextjs'

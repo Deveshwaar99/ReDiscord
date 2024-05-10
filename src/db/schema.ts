@@ -186,3 +186,5 @@ export type SelectProfile = typeof Profile.$inferSelect
 export type SelectServer = typeof Server.$inferSelect
 export type SelectMember = typeof Member.$inferSelect
 export type SelectChannel = typeof Channel.$inferSelect
+
+export type channelEnum = typeof ChannelType.enumValues

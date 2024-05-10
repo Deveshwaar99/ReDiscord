@@ -1,6 +1,8 @@
+import 'server-only'
+
+import * as schema from '@/db/schema'
 import { Pool } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-serverless'
-import * as schema from '@/db/schema'
 // let dbInstance: NeonHttpDatabase<Record<string, never>>
 
 // if (!dbInstance) {

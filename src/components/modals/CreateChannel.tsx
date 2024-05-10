@@ -1,10 +1,8 @@
 'use client'
-import FileUpload from '@/components/FileUpload'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogOverlay,
@@ -21,18 +19,30 @@ import {
 import { Input } from '@/components/ui/input'
 import { useModalStore } from '@/hooks/useModalStore'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
 import { z } from 'zod'
 
-function CreateServerModal() {
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { ChannelType } from '@/db/schema'
+import axios from 'axios'
+import toast from 'react-hot-toast'
+
+function CreateChannelModal() {
   const [isLoading, setIsLoading] = useState(false)
 
-  const { isOpen, type, onClose } = useModalStore()
-  const isModalOpen = isOpen && type === 'create-server'
+  const { isOpen, type, onClose, data } = useModalStore()
+  const { server, channelType } = data
+  const isModalOpen = isOpen && type === 'create-channel'
 
   const router = useRouter()
 
@@ -40,41 +50,41 @@ function CreateServerModal() {
     name: z
       .string()
       .min(5, {
-        message: 'Server name must be between 5 to 25 characters.',
+        message: 'Channel name must be between 5 to 25 characters.',
       })
       .max(25, {
-        message: 'Server name must be between 5 to 25 characters.',
-      }),
-
-    imageUrl: z.string().min(1, {
-      message: 'Server image is required.',
-    }),
+        message: 'Channel name must be between 5 to 25 characters.',
+      })
+      .refine(name => name !== 'general', { message: " Channel Name cannot be 'general'" }),
+    type: z.enum(ChannelType.enumValues),
   })
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      imageUrl: 'https://utfs.io/f/f9084c92-c855-4945-b8cb-8e9e8f663ec8-9394t8.jpg',
     },
   })
+
+  useEffect(() => {
+    if (channelType !== undefined) {
+      form.setValue('type', channelType)
+    } else {
+      form.resetField('type')
+    }
+  }, [form, channelType])
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
     console.log(values)
     try {
-      const { data } = await axios.post('/api/servers', values)
-      if (data.error) {
-        toast.error(data.error)
-        return console.error(data.error)
-      }
-      toast.success('Server Created')
-
+      await axios.post(`/api/servers/${server?.id}/channels`, values)
+      toast.success('Channel Created')
       form.reset()
       onClose()
       router.refresh()
     } catch (error) {
-      toast.error('Unable to create Server!')
+      toast.error('Unable to create Channel!')
       console.error(error)
     } finally {
       setIsLoading(false)
@@ -91,48 +101,52 @@ function CreateServerModal() {
       <DialogOverlay className="bg-transparent" />
       <DialogContent className="w-[440px] overflow-hidden border-none bg-white p-0 text-primary dark:bg-[#313338]">
         <DialogHeader className="px-6 pt-8">
-          <DialogTitle className="text-center text-2xl font-bold">Create your Server</DialogTitle>
-          <DialogDescription className="text-balance text-center text-zinc-500 dark:text-gray-400">
-            Give youe new server a personality with a name and an icon.You can always change it
-            later
-          </DialogDescription>
+          <DialogTitle className="text-center text-2xl font-bold">Create your Channel</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="space-y-6 px-6">
-              <div className="flex items-center justify-center text-center">
-                <FormField
-                  control={form.control}
-                  name="imageUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <FileUpload
-                          endpoint="serverImage"
-                          value={field.value}
-                          onChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <div className="flex items-center justify-center text-center"></div>
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs font-bold uppercase text-zinc-500 dark:text-[#b5bac1]">
-                      SERVER NAME
+                      CHANNEL NAME
                     </FormLabel>
                     <FormControl>
                       <Input
                         className="border-0 bg-zinc-300/50 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-[#1e1f22] dark:text-[#dbdee1]"
-                        placeholder="My server"
+                        placeholder="Enter channel name"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <Select disabled={isLoading} onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger className="border-0 bg-zinc-300/50 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-[#1e1f22] dark:text-[#dbdee1]">
+                        <SelectValue placeholder="Select a channel type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Channel Types</SelectLabel>
+                          {ChannelType.enumValues.map(item => (
+                            <SelectItem key={item} value={item}>
+                              {item}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
@@ -153,4 +167,4 @@ function CreateServerModal() {
   )
 }
 
-export default CreateServerModal
+export default CreateChannelModal

@@ -1,11 +1,11 @@
+import ModalProvider from '@/components/providers/modal-provider'
+import { ThemeProvider } from '@/components/providers/theme-provider'
+import ToastProvider from '@/components/providers/toast-provider'
+import { cn } from '@/lib/utils'
+import { ClerkProvider } from '@clerk/nextjs'
 import type { Metadata } from 'next'
 import { Open_Sans } from 'next/font/google'
 import './globals.css'
-import { ClerkProvider } from '@clerk/nextjs'
-import { ThemeProvider } from '@/components/providers/theme-provider'
-import { cn } from '@/lib/utils'
-import ToastProvider from '@/components/providers/toast-provider'
-import ModalProvider from '@/components/providers/modal-provider'
 
 const font = Open_Sans({ subsets: ['latin'] })
 

@@ -10,7 +10,7 @@ function NavigiationAction() {
       <ActionTooltip side="right" align="center" label="Add a server">
         <button
           onClick={() => {
-            onOpen('create-server')
+            onOpen('create-server', {})
           }}
           className="group flex items-center"
         >

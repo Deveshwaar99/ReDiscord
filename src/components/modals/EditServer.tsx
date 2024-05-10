@@ -1,4 +1,5 @@
 'use client'
+
 import FileUpload from '@/components/FileUpload'
 import { Button } from '@/components/ui/button'
 import {
@@ -23,18 +24,19 @@ import { useModalStore } from '@/hooks/useModalStore'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
 
-function CreateServerModal() {
+function EditServerModal() {
   const [isLoading, setIsLoading] = useState(false)
-
-  const { isOpen, type, onClose } = useModalStore()
-  const isModalOpen = isOpen && type === 'create-server'
-
   const router = useRouter()
+
+  const { isOpen, type, onClose, data } = useModalStore()
+  const { server } = data
+
+  const isModalOpen = isOpen && type === 'edit-server'
 
   const formSchema = z.object({
     name: z
@@ -50,32 +52,39 @@ function CreateServerModal() {
       message: 'Server image is required.',
     }),
   })
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      imageUrl: 'https://utfs.io/f/f9084c92-c855-4945-b8cb-8e9e8f663ec8-9394t8.jpg',
+      name: server?.name || ' ',
+      imageUrl:
+        server?.imageUrl || 'https://utfs.io/f/f9084c92-c855-4945-b8cb-8e9e8f663ec8-9394t8.jpg',
     },
   })
+  useEffect(() => {
+    if (server) {
+      form.setValue('name', server.name)
+      form.setValue('imageUrl', server.imageUrl)
+    }
+  }, [server, form])
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true)
-    console.log(values)
     try {
-      const { data } = await axios.post('/api/servers', values)
-      if (data.error) {
-        toast.error(data.error)
-        return console.error(data.error)
-      }
-      toast.success('Server Created')
+      setIsLoading(true)
+      const isSameData = values.name === server?.name && values.imageUrl === server?.imageUrl
 
+      if (isSameData) {
+        return toast('No values changed')
+      }
+      const response = await axios.patch(`/api/servers/${server?.id}`, values)
+      if (response) {
+        toast.success('Server details updated successfully')
+      }
       form.reset()
       onClose()
       router.refresh()
     } catch (error) {
-      toast.error('Unable to create Server!')
-      console.error(error)
+      console.error('Edit server Error--', error)
+      toast.error('Somthing went wrong')
     } finally {
       setIsLoading(false)
     }
@@ -91,7 +100,7 @@ function CreateServerModal() {
       <DialogOverlay className="bg-transparent" />
       <DialogContent className="w-[440px] overflow-hidden border-none bg-white p-0 text-primary dark:bg-[#313338]">
         <DialogHeader className="px-6 pt-8">
-          <DialogTitle className="text-center text-2xl font-bold">Create your Server</DialogTitle>
+          <DialogTitle className="text-center text-2xl font-bold">Edit your Server</DialogTitle>
           <DialogDescription className="text-balance text-center text-zinc-500 dark:text-gray-400">
             Give youe new server a personality with a name and an icon.You can always change it
             later
@@ -142,7 +151,7 @@ function CreateServerModal() {
                   disabled={isLoading}
                   className="w-full bg-indigo-500 text-white hover:bg-indigo-500/90"
                 >
-                  Create
+                  Save
                 </Button>
               </DialogFooter>
             </div>
@@ -153,4 +162,4 @@ function CreateServerModal() {
   )
 }
 
-export default CreateServerModal
+export default EditServerModal

@@ -4,21 +4,33 @@ import NavigationItem from '@/components/navigation/NavigationItem'
 import NavigiationAction from '@/components/navigation/NavigiationAction'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { db } from '@/db'
+import { Member, Server } from '@/db/schema'
 import { getProfile } from '@/lib/getProfile'
 import { UserButton, redirectToSignIn } from '@clerk/nextjs'
+import { and, asc, eq, exists, ne } from 'drizzle-orm'
 
 async function NavigationSidebar() {
   const profile = await getProfile()
   if (!profile) {
     return redirectToSignIn()
   }
-  const servers = await db.query.Server.findMany({
-    with: {
-      members: {
-        where: (members, { eq }) => eq(members.profileId, profile.id),
-      },
-    },
+  const ownedServers = await db.query.Server.findMany({
+    where: eq(Server.profileId, profile.id),
+    orderBy: (Server, { asc }) => [asc(Server.createdAt)],
   })
+
+  const memberSq = db
+    .select()
+    .from(Member)
+    .where(and(eq(Member.profileId, profile.id), eq(Member.serverId, Server.id)))
+
+  const memberServers = await db
+    .select()
+    .from(Server)
+    .where(and(ne(Server.profileId, profile.id), exists(memberSq)))
+    .orderBy(asc(Server.createdAt))
+
+  const servers = [...ownedServers, ...memberServers]
 
   return (
     <div className="flex h-full w-full flex-col items-center space-y-4 bg-[#E3E5E8] py-3 text-primary dark:bg-[#1E1F22]">
