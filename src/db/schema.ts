@@ -11,10 +11,10 @@ export const Profile = pgTable('profile', {
   id: varchar('id', { length: 12 })
     .primaryKey()
     .$defaultFn(() => generatePublicId()),
-  clerkId: text('clerkId').unique(),
+  clerkId: text('clerkId').unique().notNull(),
   name: text('name').notNull(),
   imageUrl: text('imageUrl'),
-  email: text('email').unique(),
+  email: text('email').unique().notNull(),
   createdAt: timestamp('createdAt').defaultNow(),
   updatedAt: timestamp('updatedAt')
     .defaultNow()
