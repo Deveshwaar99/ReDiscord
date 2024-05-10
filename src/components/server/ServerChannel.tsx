@@ -5,7 +5,7 @@ import { useModalStore } from '@/hooks/useModalStore'
 import { cn } from '@/lib/utils'
 import { Edit, Hash, Lock, LucideIcon, Mic, Trash, Video } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
-import { useParams } from 'next/navigation'
+import { MouseEvent } from 'react'
 import { ChannelTypes, MemberRoles } from '../../../types'
 import ActionTooltip from '../ActionTooltip'
 
@@ -31,10 +31,15 @@ function ServerChannel({ channel, server, role }: ServerChannelProps) {
     router.push(`/server/${server.id}/channels/${channel.id}`)
   }
 
+  const onAction = (e: MouseEvent, action: 'edit-channel' | 'delete-channel') => {
+    e.stopPropagation()
+    onOpen(action, { server, channel })
+  }
+
   const Icon = iconMap[channel.type]
   return (
     <button
-      onClick={() => {}}
+      onClick={onClick}
       className={cn(
         'group mb-1 flex w-full items-center gap-x-2 rounded-md px-2 py-2 transition hover:bg-zinc-700/10 dark:hover:bg-zinc-700/50',
         params?.channelId === channel.id ? ' bg-zinc-700/20 dark:bg-zinc-700' : undefined
@@ -59,18 +64,14 @@ function ServerChannel({ channel, server, role }: ServerChannelProps) {
         <div className="ml-auto flex items-center gap-x-2">
           <ActionTooltip label={'Edit'}>
             <Edit
-              onClick={() => {
-                onOpen('edit-channel', { server, channel })
-              }}
+              onClick={e => onAction(e, 'edit-channel')}
               className="hidden h-4 w-4 text-zinc-500 hover:text-zinc-600 group-hover:block dark:text-zinc-400 dark:hover:text-zinc-300"
             />
           </ActionTooltip>
 
           <ActionTooltip label={'Delete'}>
             <Trash
-              onClick={() => {
-                onOpen('delete-channel', { server, channel })
-              }}
+              onClick={e => onAction(e, 'delete-channel')}
               className="hidden h-4 w-4 text-zinc-500 hover:text-zinc-600 group-hover:block dark:text-zinc-400 dark:hover:text-zinc-300"
             />
           </ActionTooltip>
