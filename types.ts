@@ -1,10 +1,20 @@
 import { SelectChannel, SelectMember, SelectProfile, SelectServer } from '@/db/schema'
 
-export type ServerWithMemberAndProfile = SelectServer & {
-  members: (SelectMember & { profile: SelectProfile })[]
+export type MembersWithProfile = SelectMember & { profile: SelectProfile }
+
+export type ServerDetails = SelectServer & {
+  members: MembersWithProfile[]
   channels: SelectChannel[]
 }
 
-export type ChannelTypes = 'TEXT' | 'AUDIO' | 'VIDEO'
+export enum ChannelTypes {
+  TEXT = 'TEXT',
+  AUDIO = 'AUDIO',
+  VIDEO = 'VIDEO',
+}
 
-export type MemberRoles = 'ADMIN' | 'MODERATOR' | 'GUEST'
+export enum MemberRoles {
+  ADMIN = 'ADMIN',
+  MODERATOR = 'MODERATOR',
+  GUEST = 'GUEST',
+}
