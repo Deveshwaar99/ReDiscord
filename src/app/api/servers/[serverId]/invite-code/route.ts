@@ -1,9 +1,9 @@
 import { db } from '@/db'
 import { Server } from '@/db/schema'
+import { generatePublicId } from '@/lib/generatePublicId'
 import { getProfile } from '@/lib/getProfile'
 import { and, eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
-import { v4 as uuidv4 } from 'uuid'
 
 export async function PATCH(req: Request, { params }: { params: { serverId: string } }) {
   try {
@@ -18,7 +18,7 @@ export async function PATCH(req: Request, { params }: { params: { serverId: stri
 
     const [server] = await db
       .update(Server)
-      .set({ inviteCode: uuidv4() })
+      .set({ inviteCode: generatePublicId() })
       .where(and(eq(Server.id, params.serverId), eq(Server.profileId, profile.id)))
       .returning()
 
