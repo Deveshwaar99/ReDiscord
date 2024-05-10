@@ -1,28 +1,20 @@
 import { db } from '@/db'
 import { Channel, Member, Server } from '@/db/schema'
 import { getProfile } from '@/lib/getProfile'
+import { verifyChannelData } from '@/lib/utils'
 import { and, eq, exists, or } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-
-const validateChannelData = z.object({
-  name: z
-    .string()
-    .min(5)
-    .max(15)
-    .refine(val => val !== 'general', {
-      message: "The name cannot be 'general'",
-    }),
-  type: z.enum(['AUDIO', 'TEXT', 'VIDEO']),
-})
 
 export async function POST(req: NextRequest, { params }: { params: { serverId: string } }) {
   try {
     const requestData = await req.json()
-    const validatedData = validateChannelData.parse(requestData)
+    const validatedData = verifyChannelData(requestData)
 
-    // Access the validated data
-    const { name, type } = validatedData
+    if (!validatedData.success) {
+      return NextResponse.json({ error: 'Invalid input data' }, { status: 400 })
+    }
+
+    const { name, type } = validatedData.data
 
     const profile = await getProfile()
     if (!profile) {
@@ -55,11 +47,7 @@ export async function POST(req: NextRequest, { params }: { params: { serverId: s
 
     return NextResponse.json(createdChannel)
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      // Handle validation errors
-      return NextResponse.json({ error: error.issues }, { status: 400 })
-    }
-    console.error('--Create Channel Error--', error)
+    console.error('[--Create Channel Error--]', error)
     NextResponse.json({ error: 'Failed to create channel' }, { status: 500 })
   }
 }
