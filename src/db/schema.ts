@@ -11,7 +11,7 @@ export const Profile = pgTable('profile', {
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   clerkId: text('clerkId').unique(),
-  name: text('name'),
+  name: text('name').notNull(),
   imageUrl: text('imageUrl'),
   email: text('email').unique(),
   createdAt: timestamp('createdAt').defaultNow(),
@@ -64,7 +64,7 @@ export const Channel = pgTable('channel', {
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   name: text('name').notNull(),
-  type: ChannelType('type').default('TEXT'),
+  type: ChannelType('type').default('TEXT').notNull(),
   profileId: text('profileId')
     .notNull()
     .references(() => Profile.id, { onDelete: 'cascade' }),
