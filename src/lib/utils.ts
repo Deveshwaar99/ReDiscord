@@ -6,6 +6,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+const ServerDataSchema = z.object({
+  name: z.string().min(5).max(25),
+  imageUrl: z.string().min(1),
+})
+
 const ChannelDataSchema = z.object({
   name: z
     .string()
@@ -16,7 +21,11 @@ const ChannelDataSchema = z.object({
     }),
   type: z.enum(['AUDIO', 'TEXT', 'VIDEO']),
 })
+
+export function verifyServerData(requestData: any) {
+  return ServerDataSchema.safeParse(requestData)
+}
+
 export function verifyChannelData(requestData: any) {
-  const result = ChannelDataSchema.safeParse(requestData)
-  return result
+  return ChannelDataSchema.safeParse(requestData)
 }
