@@ -1,8 +1,7 @@
 import { getProfile } from '@/lib/getProfile'
-import { getServerWithMembersAndChannels } from '@/lib/getServerData'
 import { Hash, Mic, ShieldAlert, ShieldCheck, Video } from 'lucide-react'
 import { redirect } from 'next/navigation'
-import { ChannelTypes, MemberRoles } from '../../../types'
+import { ChannelTypes, MemberRoles, ServerDetails } from '../../../types'
 import { ScrollArea } from '../ui/scroll-area'
 import { Separator } from '../ui/separator'
 import ServerChannel from './ServerChannel'
@@ -12,7 +11,8 @@ import ServerSection from './ServerSection'
 import ServerSidebarHeader from './ServerSidebarHeader'
 
 interface ServerSidebarProps {
-  serverId: string
+  server: ServerDetails
+  role: MemberRoles
 }
 
 const iconMap: { [key in ChannelTypes]: React.JSX.Element } = {
@@ -27,16 +27,10 @@ const roleIconMap: { [key in MemberRoles]: React.JSX.Element | null } = {
   ADMIN: <ShieldAlert className="mr-2 h-4 w-4 text-rose-500" />,
 } as const
 
-async function ServerSidebar({ serverId }: ServerSidebarProps) {
+async function ServerSidebar({ server, role }: ServerSidebarProps) {
   const profile = await getProfile()
 
   if (!profile) {
-    return redirect('/')
-  }
-
-  const server = await getServerWithMembersAndChannels(serverId)
-
-  if (!server) {
     return redirect('/')
   }
 
