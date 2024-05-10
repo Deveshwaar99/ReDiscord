@@ -8,11 +8,11 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useModalStore } from '@/hooks/useModalStore'
 import { ChevronDown, LogOut, PlusCircle, Settings, Trash, UserPlus, Users } from 'lucide-react'
-import { ServerWithMemberAndProfile } from '../../../types'
+import { ServerDetails } from '../../../types'
 
 interface ServerSidebarHeaderProps {
-  server: ServerWithMemberAndProfile
-  role: 'ADMIN' | 'MODERATOR' | 'GUEST' | undefined
+  server: ServerDetails
+  role: 'ADMIN' | 'MODERATOR' | 'GUEST'
 }
 
 function ServerSidebarHeader({ server, role }: ServerSidebarHeaderProps) {

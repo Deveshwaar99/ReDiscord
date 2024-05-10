@@ -15,7 +15,7 @@ import {
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { ServerWithMemberAndProfile } from '../../../types'
+import { ServerDetails } from '../../../types'
 import UserAvatar from '../UserAvatar'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog'
 import {
@@ -43,7 +43,7 @@ function ManageMembersModal() {
 
   const { isOpen, onClose, data, type, onOpen } = useModalStore()
   const isModalOpen = isOpen && type === 'manage-members'
-  const { server } = data as { server: ServerWithMemberAndProfile }
+  const { server } = data as { server: ServerDetails }
 
   const onRoleChange = async (member: SelectMember, newRole: 'MODERATOR' | 'GUEST') => {
     if (member.role === newRole) return

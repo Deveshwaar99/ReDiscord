@@ -1,7 +1,7 @@
 'use client'
 import { useModalStore } from '@/hooks/useModalStore'
 import { Plus, Settings } from 'lucide-react'
-import { ChannelTypes, MemberRoles, ServerWithMemberAndProfile } from '../../../types'
+import { ChannelTypes, MemberRoles, ServerDetails } from '../../../types'
 import ActionTooltip from '../ActionTooltip'
 
 type ServerSectionProps = {
@@ -9,7 +9,7 @@ type ServerSectionProps = {
   sectionType: 'channels' | 'members'
   channelType?: ChannelTypes
   role: MemberRoles | undefined
-  server: ServerWithMemberAndProfile
+  server: ServerDetails
 }
 
 function ServerSection({ label, sectionType, channelType, role, server }: ServerSectionProps) {
