@@ -21,10 +21,10 @@ const iconMap: { [key in ChannelTypes]: React.JSX.Element } = {
   VIDEO: <Video className="mr-2 h-4 w-4" />,
 } as const
 
-const roleIconMap: { [key in MemberRoles]: React.JSX.Element | null } = {
-  GUEST: null,
-  MODERATOR: <ShieldCheck className="mr-2 h-4 w-4 text-indigo-500" />,
-  ADMIN: <ShieldAlert className="mr-2 h-4 w-4 text-rose-500" />,
+const roleIconMap = {
+  [MemberRoles.GUEST]: null,
+  [MemberRoles.MODERATOR]: <ShieldCheck className="mr-2 h-4 w-4 text-indigo-500" />,
+  [MemberRoles.ADMIN]: <ShieldAlert className="mr-2 h-4 w-4 text-rose-500" />,
 } as const
 
 async function ServerSidebar({ server, role }: ServerSidebarProps) {
@@ -39,10 +39,10 @@ async function ServerSidebar({ server, role }: ServerSidebarProps) {
   const videoChannels = server.channels.filter(channel => channel.type === 'VIDEO')
   const members = server.members.filter(member => member.profileId !== profile.id)
 
-  const role = server.members.find(member => member.profileId === profile.id)?.role
   return (
     <div className="flex h-full w-full flex-col bg-[#F2F3F5] text-primary dark:bg-[#2B2D31]">
       <ServerSidebarHeader server={server} role={role} />
+
       <ScrollArea className="flex-1 px-3">
         <div className="mt-2">
           {/* add a search option  */}
@@ -95,15 +95,20 @@ async function ServerSidebar({ server, role }: ServerSidebarProps) {
           <div className="mb-2">
             <ServerSection
               sectionType="channels"
-              channelType="TEXT"
-              role={role}
+              channelType={ChannelTypes.TEXT}
+              role={MemberRoles[role]}
               label="Text Channels"
               server={server}
             />
             {/* List the available TEXT channels */}
             <div className="space-y-2">
               {textChannels.map(channel => (
-                <ServerChannel key={channel.id} channel={channel} server={server} role={role} />
+                <ServerChannel
+                  key={channel.id}
+                  channel={channel}
+                  server={server}
+                  role={MemberRoles[role]}
+                />
               ))}
             </div>
           </div>
@@ -114,15 +119,20 @@ async function ServerSidebar({ server, role }: ServerSidebarProps) {
           <div className="mb-2">
             <ServerSection
               sectionType="channels"
-              channelType="AUDIO"
-              role={role}
+              channelType={ChannelTypes.AUDIO}
+              role={MemberRoles[role]}
               label="Voice Channels"
               server={server}
             />
             {/* List the available AUDIO channels */}
             <div className="space-y-2">
               {audioChannels.map(channel => (
-                <ServerChannel key={channel.id} channel={channel} server={server} role={role} />
+                <ServerChannel
+                  key={channel.id}
+                  channel={channel}
+                  server={server}
+                  role={MemberRoles[role]}
+                />
               ))}
             </div>
           </div>
@@ -133,15 +143,20 @@ async function ServerSidebar({ server, role }: ServerSidebarProps) {
           <div className="mb-2">
             <ServerSection
               sectionType="channels"
-              channelType="VIDEO"
-              role={role}
+              channelType={ChannelTypes.VIDEO}
+              role={MemberRoles[role]}
               label="Video Channels"
               server={server}
             />
             {/* List the available VIDEO channels */}
             <div className="space-y-2">
               {videoChannels.map(channel => (
-                <ServerChannel key={channel.id} channel={channel} server={server} role={role} />
+                <ServerChannel
+                  key={channel.id}
+                  channel={channel}
+                  server={server}
+                  role={MemberRoles[role]}
+                />
               ))}
             </div>
           </div>
@@ -150,11 +165,21 @@ async function ServerSidebar({ server, role }: ServerSidebarProps) {
         {!!members.length && (
           <div className="mb-2">
             {/*  MEMBER Header with Manage Members button */}
-            <ServerSection sectionType="members" role={role} label="Members" server={server} />
+            <ServerSection
+              sectionType="members"
+              role={MemberRoles[role]}
+              label="Members"
+              server={server}
+            />
             {/* List the MEMERS */}
             <div className="space-y-2">
               {members.map(member => (
-                <ServerMember key={member.id} member={member} server={server} role={role} />
+                <ServerMember
+                  key={member.id}
+                  member={member}
+                  server={server}
+                  role={MemberRoles[role]}
+                />
               ))}
             </div>
           </div>
