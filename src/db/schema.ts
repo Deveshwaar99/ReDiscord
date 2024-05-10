@@ -1,5 +1,6 @@
-import { relations, sql } from 'drizzle-orm'
-import { pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
+import { generatePublicId } from '@/lib/generatePublicId'
+import { relations } from 'drizzle-orm'
+import { pgEnum, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core'
 
 // Enums
 export const MemberRole = pgEnum('memberRole', ['ADMIN', 'MODERATOR', 'GUEST'])
@@ -7,9 +8,9 @@ export const ChannelType = pgEnum('channelType', ['TEXT', 'AUDIO', 'VIDEO'])
 
 // Profile Table
 export const Profile = pgTable('profile', {
-  id: text('id')
+  id: varchar('id', { length: 12 })
     .primaryKey()
-    .default(sql`gen_random_uuid()`),
+    .$defaultFn(() => generatePublicId()),
   clerkId: text('clerkId').unique(),
   name: text('name').notNull(),
   imageUrl: text('imageUrl'),
@@ -22,15 +23,15 @@ export const Profile = pgTable('profile', {
 
 // Server Table
 export const Server = pgTable('server', {
-  id: text('id')
+  id: varchar('id', { length: 12 })
     .primaryKey()
-    .default(sql`gen_random_uuid()`),
+    .$defaultFn(() => generatePublicId()),
   name: text('name').notNull(),
   imageUrl: text('imageUrl').notNull(),
   inviteCode: text('inviteCode')
     .unique()
     .notNull()
-    .default(sql`gen_random_uuid()`),
+    .$defaultFn(() => generatePublicId()),
   profileId: text('profileId')
     .notNull()
     .references(() => Profile.id, { onDelete: 'cascade' }),
@@ -42,9 +43,9 @@ export const Server = pgTable('server', {
 
 // Member Table
 export const Member = pgTable('member', {
-  id: text('id')
+  id: varchar('id', { length: 12 })
     .primaryKey()
-    .default(sql`gen_random_uuid()`),
+    .$defaultFn(() => generatePublicId()),
   role: MemberRole('role').default('GUEST').notNull(),
   profileId: text('profileId')
     .notNull()
@@ -60,9 +61,9 @@ export const Member = pgTable('member', {
 
 // Channel Relations
 export const Channel = pgTable('channel', {
-  id: text('id')
+  id: varchar('id', { length: 12 })
     .primaryKey()
-    .default(sql`gen_random_uuid()`),
+    .$defaultFn(() => generatePublicId()),
   name: text('name').notNull(),
   type: ChannelType('type').default('TEXT').notNull(),
   profileId: text('profileId')
@@ -79,9 +80,9 @@ export const Channel = pgTable('channel', {
 
 // Message Table
 export const Message = pgTable('message', {
-  id: text('id')
+  id: varchar('id', { length: 12 })
     .primaryKey()
-    .default(sql`gen_random_uuid()`),
+    .$defaultFn(() => generatePublicId()),
   content: text('content').notNull(),
   fileUrl: text('fileUrl'),
   memberId: text('memberId')
@@ -99,9 +100,9 @@ export const Message = pgTable('message', {
 
 // Conversation Table
 export const Conversation = pgTable('conversation', {
-  id: text('id')
+  id: varchar('id', { length: 12 })
     .primaryKey()
-    .default(sql`gen_random_uuid()`),
+    .$defaultFn(() => generatePublicId()),
   memberOneId: text('memberOneId')
     .notNull()
     .references(() => Member.id, { onDelete: 'cascade' }),
@@ -116,9 +117,9 @@ export const Conversation = pgTable('conversation', {
 
 // DirectMessage Table
 export const DirectMessage = pgTable('directMessage', {
-  id: text('id')
+  id: varchar('id', { length: 12 })
     .primaryKey()
-    .default(sql`gen_random_uuid()`),
+    .$defaultFn(() => generatePublicId()),
   content: text('content').notNull(),
   fileUrl: text('fileUrl'),
   memberId: text('memberId')
