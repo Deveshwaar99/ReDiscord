@@ -4,6 +4,7 @@ import { SelectChannel, SelectServer } from '@/db/schema'
 import { useModalStore } from '@/hooks/useModalStore'
 import { cn } from '@/lib/utils'
 import { Edit, Hash, Lock, LucideIcon, Mic, Trash, Video } from 'lucide-react'
+import { useParams, useRouter } from 'next/navigation'
 import { useParams } from 'next/navigation'
 import { ChannelTypes, MemberRoles } from '../../../types'
 import ActionTooltip from '../ActionTooltip'
@@ -22,8 +23,13 @@ const iconMap: { [key in ChannelTypes]: LucideIcon } = {
 
 function ServerChannel({ channel, server, role }: ServerChannelProps) {
   const params = useParams()
+  const router = useRouter()
 
   const { onOpen } = useModalStore()
+
+  const onClick = () => {
+    router.push(`/server/${server.id}/channels/${channel.id}`)
+  }
 
   const Icon = iconMap[channel.type]
   return (
