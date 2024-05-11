@@ -5,7 +5,7 @@ import { getProfile } from '@/lib/getProfile'
 import { redirectToSignIn } from '@clerk/nextjs'
 import { eq } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
-import { MemberRoles } from '../../../../../../types'
+import { MemberRoles } from '../../../../../types'
 
 async function ServerLayout({
   children,
