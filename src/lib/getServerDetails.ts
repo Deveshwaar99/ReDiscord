@@ -1,7 +1,9 @@
-import { db } from '@/db'
 import 'server-only'
 
-export async function getServerWithMembersAndChannels(serverId: string) {
+import { db } from '@/db'
+import { cache } from 'react'
+
+async function getServerWithMembersAndChannels(serverId: string) {
   const server = await db.query.Server.findFirst({
     where: (Server, { eq }) => eq(Server.id, serverId),
     with: {
@@ -19,3 +21,7 @@ export async function getServerWithMembersAndChannels(serverId: string) {
 
   return server
 }
+
+const getServerDetails = cache(getServerWithMembersAndChannels)
+
+export { getServerDetails }
