@@ -1,7 +1,8 @@
 import { getProfile } from '@/lib/getProfile'
+import { getServerDetails } from '@/lib/getServerDetails'
 import { Hash, Mic, ShieldAlert, ShieldCheck, Video } from 'lucide-react'
 import { redirect } from 'next/navigation'
-import { ChannelTypes, MemberRoles, ServerDetails } from '../../../types'
+import { ChannelTypes, MemberRoles } from '../../../types'
 import { ScrollArea } from '../ui/scroll-area'
 import { Separator } from '../ui/separator'
 import ServerChannel from './ServerChannel'
@@ -11,8 +12,7 @@ import ServerSection from './ServerSection'
 import ServerSidebarHeader from './ServerSidebarHeader'
 
 interface ServerSidebarProps {
-  server: ServerDetails
-  role: MemberRoles
+  serverId: string
 }
 
 const iconMap: { [key in ChannelTypes]: React.JSX.Element } = {
@@ -27,21 +27,28 @@ const roleIconMap = {
   [MemberRoles.ADMIN]: <ShieldAlert className="mr-2 h-4 w-4 text-rose-500" />,
 } as const
 
-async function ServerSidebar({ server, role }: ServerSidebarProps) {
+async function ServerSidebar({ serverId }: ServerSidebarProps) {
   const profile = await getProfile()
 
   if (!profile) {
     return redirect('/')
   }
 
+  const server = await getServerDetails(serverId)
+
+  if (!server) {
+    redirect('/')
+  }
+
   const textChannels = server.channels.filter(channel => channel.type === 'TEXT')
   const audioChannels = server.channels.filter(channel => channel.type === 'AUDIO')
   const videoChannels = server.channels.filter(channel => channel.type === 'VIDEO')
   const members = server.members.filter(member => member.profileId !== profile.id)
+  const role = server.members.find(member => member.profileId === profile.id)?.role
 
   return (
     <div className="flex h-full w-full flex-col bg-[#F2F3F5] text-primary dark:bg-[#2B2D31]">
-      <ServerSidebarHeader server={server} role={role} />
+      <ServerSidebarHeader server={server} role={role!} />
 
       <ScrollArea className="flex-1 px-3">
         <div className="mt-2">
@@ -96,7 +103,7 @@ async function ServerSidebar({ server, role }: ServerSidebarProps) {
             <ServerSection
               sectionType="channels"
               channelType={ChannelTypes.TEXT}
-              role={MemberRoles[role]}
+              role={MemberRoles[role!]}
               label="Text Channels"
               server={server}
             />
@@ -107,7 +114,7 @@ async function ServerSidebar({ server, role }: ServerSidebarProps) {
                   key={channel.id}
                   channel={channel}
                   server={server}
-                  role={MemberRoles[role]}
+                  role={MemberRoles[role!]}
                 />
               ))}
             </div>
@@ -120,7 +127,7 @@ async function ServerSidebar({ server, role }: ServerSidebarProps) {
             <ServerSection
               sectionType="channels"
               channelType={ChannelTypes.AUDIO}
-              role={MemberRoles[role]}
+              role={MemberRoles[role!]}
               label="Voice Channels"
               server={server}
             />
@@ -131,7 +138,7 @@ async function ServerSidebar({ server, role }: ServerSidebarProps) {
                   key={channel.id}
                   channel={channel}
                   server={server}
-                  role={MemberRoles[role]}
+                  role={MemberRoles[role!]}
                 />
               ))}
             </div>
@@ -144,7 +151,7 @@ async function ServerSidebar({ server, role }: ServerSidebarProps) {
             <ServerSection
               sectionType="channels"
               channelType={ChannelTypes.VIDEO}
-              role={MemberRoles[role]}
+              role={MemberRoles[role!]}
               label="Video Channels"
               server={server}
             />
@@ -155,7 +162,7 @@ async function ServerSidebar({ server, role }: ServerSidebarProps) {
                   key={channel.id}
                   channel={channel}
                   server={server}
-                  role={MemberRoles[role]}
+                  role={MemberRoles[role!]}
                 />
               ))}
             </div>
@@ -167,7 +174,7 @@ async function ServerSidebar({ server, role }: ServerSidebarProps) {
             {/*  MEMBER Header with Manage Members button */}
             <ServerSection
               sectionType="members"
-              role={MemberRoles[role]}
+              role={MemberRoles[role!]}
               label="Members"
               server={server}
             />
@@ -178,7 +185,7 @@ async function ServerSidebar({ server, role }: ServerSidebarProps) {
                   key={member.id}
                   member={member}
                   server={server}
-                  role={MemberRoles[role]}
+                  role={MemberRoles[role!]}
                 />
               ))}
             </div>
