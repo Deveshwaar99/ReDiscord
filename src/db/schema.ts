@@ -1,82 +1,112 @@
 import { generatePublicId } from '@/lib/generatePublicId'
 import { relations } from 'drizzle-orm'
-import { pgEnum, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core'
+import { index, pgEnum, pgTable, text, timestamp, uniqueIndex, varchar } from 'drizzle-orm/pg-core'
 
 // Enums
 export const MemberRole = pgEnum('memberRole', ['ADMIN', 'MODERATOR', 'GUEST'])
 export const ChannelType = pgEnum('channelType', ['TEXT', 'AUDIO', 'VIDEO'])
 
 // Profile Table
-export const Profile = pgTable('profile', {
-  id: varchar('id', { length: 12 })
-    .primaryKey()
-    .$defaultFn(() => generatePublicId()),
-  clerkId: text('clerkId').unique().notNull(),
-  name: text('name').notNull(),
-  imageUrl: text('imageUrl'),
-  email: text('email').unique().notNull(),
-  createdAt: timestamp('createdAt').defaultNow(),
-  updatedAt: timestamp('updatedAt')
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-})
+export const Profile = pgTable(
+  'profile',
+  {
+    id: varchar('id', { length: 12 })
+      .primaryKey()
+      .$defaultFn(() => generatePublicId()),
+    clerkId: text('clerkId').unique().notNull(),
+    name: text('name').notNull(),
+    imageUrl: text('imageUrl'),
+    email: text('email').unique().notNull(),
+    createdAt: timestamp('createdAt').defaultNow(),
+    updatedAt: timestamp('updatedAt')
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  table => {
+    return {
+      clerkIdx: uniqueIndex('prifile_clerk_idx').on(table.clerkId),
+    }
+  }
+)
 
 // Server Table
-export const Server = pgTable('server', {
-  id: varchar('id', { length: 12 })
-    .primaryKey()
-    .$defaultFn(() => generatePublicId()),
-  name: text('name').notNull(),
-  imageUrl: text('imageUrl').notNull(),
-  inviteCode: text('inviteCode')
-    .unique()
-    .notNull()
-    .$defaultFn(() => generatePublicId()),
-  profileId: text('profileId')
-    .notNull()
-    .references(() => Profile.id, { onDelete: 'cascade' }),
-  createdAt: timestamp('createdAt').defaultNow(),
-  updatedAt: timestamp('updatedAt')
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-})
+export const Server = pgTable(
+  'server',
+  {
+    id: varchar('id', { length: 12 })
+      .primaryKey()
+      .$defaultFn(() => generatePublicId()),
+    name: text('name').notNull(),
+    imageUrl: text('imageUrl').notNull(),
+    inviteCode: text('inviteCode')
+      .unique()
+      .notNull()
+      .$defaultFn(() => generatePublicId()),
+    profileId: text('profileId')
+      .notNull()
+      .references(() => Profile.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('createdAt').defaultNow(),
+    updatedAt: timestamp('updatedAt')
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  table => {
+    return {
+      profileIdx: index('server_profile_idx').on(table.profileId),
+    }
+  }
+)
 
 // Member Table
-export const Member = pgTable('member', {
-  id: varchar('id', { length: 12 })
-    .primaryKey()
-    .$defaultFn(() => generatePublicId()),
-  role: MemberRole('role').default('GUEST').notNull(),
-  profileId: text('profileId')
-    .notNull()
-    .references(() => Profile.id, { onDelete: 'cascade' }),
-  serverId: text('serverId')
-    .notNull()
-    .references(() => Server.id, { onDelete: 'cascade' }),
-  createdAt: timestamp('createdAt').defaultNow(),
-  updatedAt: timestamp('updatedAt')
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-})
+export const Member = pgTable(
+  'member',
+  {
+    id: varchar('id', { length: 12 })
+      .primaryKey()
+      .$defaultFn(() => generatePublicId()),
+    role: MemberRole('role').default('GUEST').notNull(),
+    profileId: text('profileId')
+      .notNull()
+      .references(() => Profile.id, { onDelete: 'cascade' }),
+    serverId: text('serverId')
+      .notNull()
+      .references(() => Server.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('createdAt').defaultNow(),
+    updatedAt: timestamp('updatedAt')
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  table => ({
+    profileIdIndex: index('member_profileId_idx').on(table.profileId),
+    serverIdIndex: index('member_serverId_idx').on(table.serverId),
+  })
+)
 
 // Channel Relations
-export const Channel = pgTable('channel', {
-  id: varchar('id', { length: 12 })
-    .primaryKey()
-    .$defaultFn(() => generatePublicId()),
-  name: text('name').notNull(),
-  type: ChannelType('type').default('TEXT').notNull(),
-  profileId: text('profileId')
-    .notNull()
-    .references(() => Profile.id, { onDelete: 'cascade' }),
-  serverId: text('serverId')
-    .notNull()
-    .references(() => Server.id, { onDelete: 'cascade' }),
-  createdAt: timestamp('createdAt').defaultNow(),
-  updatedAt: timestamp('updatedAt')
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-})
+export const Channel = pgTable(
+  'channel',
+  {
+    id: varchar('id', { length: 12 })
+      .primaryKey()
+      .$defaultFn(() => generatePublicId()),
+    name: text('name').notNull(),
+    type: ChannelType('type').default('TEXT').notNull(),
+    profileId: text('profileId')
+      .notNull()
+      .references(() => Profile.id, { onDelete: 'cascade' }),
+    serverId: text('serverId')
+      .notNull()
+      .references(() => Server.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('createdAt').defaultNow(),
+    updatedAt: timestamp('updatedAt')
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  table => ({
+    profileIdIndex: index('channel_profileId_idx').on(table.profileId),
+    serverIdIndex: index('channel_serverId_idx').on(table.serverId),
+  })
+)
 
 // Message Table
 export const Message = pgTable('message', {
