@@ -52,11 +52,12 @@ export const Server = pgTable(
       .unique()
       .notNull()
       .$defaultFn(() => generatePublicId()),
-    profileId: text('profileId')
+    profileId: varchar('profileId', { length: 12 })
       .notNull()
       .references(() => Profile.id, { onDelete: 'cascade' }),
-    createdAt: timestamp('createdAt').defaultNow(),
+    createdAt: timestamp('createdAt').defaultNow().notNull(),
     updatedAt: timestamp('updatedAt')
+      .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
