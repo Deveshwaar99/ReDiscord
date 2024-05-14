@@ -181,7 +181,7 @@ export const DirectMessage = pgTable('directMessage', {
     .$defaultFn(() => generatePublicId()),
   content: text('content').notNull(),
   fileUrl: text('fileUrl'),
-  memberId: text('memberId')
+  memberId: varchar('memberId', { length: 12 })
     .notNull()
     .references(() => Member.id, { onDelete: 'cascade' }),
   conversationId: text('conversationId')
