@@ -123,13 +123,15 @@ export const Channel = pgTable(
 )
 
 // Message Table
-export const Message = pgTable('message', {
+export const Message = pgTable(
+  'message',
+  {
   id: varchar('id', { length: 12 })
     .primaryKey()
     .$defaultFn(() => generatePublicId()),
   content: text('content').notNull(),
   fileUrl: text('fileUrl'),
-  memberId: text('memberId')
+    memberId: varchar('memberId', { length: 12 })
     .notNull()
     .references(() => Member.id, { onDelete: 'cascade' }),
   channelId: text('channelId')
@@ -140,7 +142,12 @@ export const Message = pgTable('message', {
   updatedAt: timestamp('updatedAt')
     .defaultNow()
     .$onUpdate(() => new Date()),
+  },
+  table => ({
+    memberIdx: index().on(table.memberId),
+    channelIdx: index().on(table.channelId),
 })
+)
 
 // Conversation Table
 export const Conversation = pgTable('conversation', {
