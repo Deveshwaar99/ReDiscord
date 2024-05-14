@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
     const createServerResult = await db.transaction(async tx => {
       // Assuming 'serverInsertResult' is the result of the first insert operation
-      const [serverInsertResult] = await tx
+      const newServer = await tx
         .insert(Server)
         .values({
           profileId: profile.id,
@@ -33,23 +33,25 @@ export async function POST(req: NextRequest) {
           imageUrl,
         })
         .returning()
+        .then(res => res[0])
 
-      const serverId = serverInsertResult.id
+      const newMember = await tx
+        .insert(Member)
+        .values({
+          profileId: profile.id,
+          role: 'ADMIN',
+          serverId: newServer.id,
+        })
+        .returning()
+        .then(res => res[0])
 
-      // Insert related records in 'channels' and 'members' tables using the transaction object 'tx'
       await tx.insert(Channel).values({
         name: 'general',
-        profileId: profile.id,
-        serverId: serverId,
+        memberId: newMember.id,
+        serverId: newServer.id,
       })
 
-      await tx.insert(Member).values({
-        profileId: profile.id,
-        role: 'ADMIN',
-        serverId: serverId,
-      })
-
-      return serverInsertResult
+      return newServer
     })
 
     return NextResponse.json({ data: createServerResult }, { status: 201 })
