@@ -150,21 +150,29 @@ export const Message = pgTable(
 )
 
 // Conversation Table
-export const Conversation = pgTable('conversation', {
+export const Conversation = pgTable(
+  'conversation',
+  {
   id: varchar('id', { length: 12 })
     .primaryKey()
     .$defaultFn(() => generatePublicId()),
-  memberOneId: text('memberOneId')
+    memberOneId: varchar('memberOneId', { length: 12 })
     .notNull()
     .references(() => Member.id, { onDelete: 'cascade' }),
-  memberTwoId: text('memberTwoId')
+    memberTwoId: varchar('memberTwoId', { length: 12 })
     .notNull()
     .references(() => Member.id, { onDelete: 'cascade' }),
   createdAt: timestamp('createdAt').defaultNow(),
   updatedAt: timestamp('updatedAt')
     .defaultNow()
     .$onUpdate(() => new Date()),
+  },
+  table => ({
+    membersUnique: unique().on(table.memberOneId, table.memberTwoId),
+    member1Idx: index().on(table.memberOneId),
+    member2Idx: index().on(table.memberTwoId),
 })
+)
 
 // DirectMessage Table
 export const DirectMessage = pgTable('directMessage', {
