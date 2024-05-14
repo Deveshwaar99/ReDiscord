@@ -1,6 +1,15 @@
 import { generatePublicId } from '@/lib/generatePublicId'
 import { relations } from 'drizzle-orm'
-import { index, pgEnum, pgTable, text, timestamp, uniqueIndex, varchar } from 'drizzle-orm/pg-core'
+import {
+  index,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uniqueIndex,
+  varchar,
+} from 'drizzle-orm/pg-core'
 
 // Enums
 export const MemberRole = pgEnum('memberRole', ['ADMIN', 'MODERATOR', 'GUEST'])
@@ -17,8 +26,9 @@ export const Profile = pgTable(
     name: text('name').notNull(),
     imageUrl: text('imageUrl'),
     email: text('email').unique().notNull(),
-    createdAt: timestamp('createdAt').defaultNow(),
+    createdAt: timestamp('createdAt').defaultNow().notNull(),
     updatedAt: timestamp('updatedAt')
+      .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
