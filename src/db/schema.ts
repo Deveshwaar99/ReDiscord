@@ -34,7 +34,7 @@ export const Profile = pgTable(
   },
   table => {
     return {
-      clerkIdx: uniqueIndex('prifile_clerk_idx').on(table.clerkId),
+      clerkIdx: uniqueIndex('clerk_idx').on(table.clerkId),
     }
   }
 )
