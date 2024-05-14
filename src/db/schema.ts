@@ -208,9 +208,13 @@ export const serverRelations = relations(Server, ({ one, many }) => ({
 }))
 
 // Member Relations
-export const memberRelations = relations(Member, ({ one }) => ({
+export const memberRelations = relations(Member, ({ one, many }) => ({
   profile: one(Profile, { fields: [Member.profileId], references: [Profile.id] }),
   server: one(Server, { fields: [Member.serverId], references: [Server.id] }),
+  channels: many(Channel),
+  messages: many(Message),
+  conversations: many(Conversation),
+  directMessages: many(DirectMessage),
 }))
 
 // Channel Relations
