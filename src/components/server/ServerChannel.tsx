@@ -28,7 +28,7 @@ function ServerChannel({ channel, server, role }: ServerChannelProps) {
   const { onOpen } = useModalStore()
 
   const onClick = () => {
-    router.push(`/server/${server.id}/channels/${channel.id}`)
+    router.push(`/servers/${server.id}/channels/${channel.id}`)
   }
 
   const onAction = (e: MouseEvent, action: 'edit-channel' | 'delete-channel') => {
