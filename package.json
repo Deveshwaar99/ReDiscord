@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:generate": "drizzle-kit generate:pg",
+    "db:generate": "drizzle-kit generate",
     "db:migrate": "bun ./src/db/migrate.ts",
     "db:studio": " drizzle-kit studio"
   },
@@ -57,7 +57,7 @@
     "autoprefixer": "^10.0.1",
     "commitlint": "^19.3.0",
     "dotenv": "^16.4.5",
-    "drizzle-kit": "^0.20.17",
+    "drizzle-kit": "^0.21.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.4",
     "postcss": "^8",
