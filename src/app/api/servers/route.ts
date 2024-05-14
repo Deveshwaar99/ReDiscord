@@ -24,7 +24,6 @@ export async function POST(req: NextRequest) {
     }
 
     const createServerResult = await db.transaction(async tx => {
-      // Assuming 'serverInsertResult' is the result of the first insert operation
       const newServer = await tx
         .insert(Server)
         .values({
