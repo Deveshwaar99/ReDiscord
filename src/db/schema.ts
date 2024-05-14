@@ -103,20 +103,22 @@ export const Channel = pgTable(
       .$defaultFn(() => generatePublicId()),
     name: text('name').notNull(),
     type: ChannelType('type').default('TEXT').notNull(),
-    profileId: text('profileId')
-      .notNull()
-      .references(() => Profile.id, { onDelete: 'cascade' }),
-    serverId: text('serverId')
+    serverId: varchar('serverId', { length: 12 })
       .notNull()
       .references(() => Server.id, { onDelete: 'cascade' }),
-    createdAt: timestamp('createdAt').defaultNow(),
+
+    memberId: varchar('memberId', { length: 12 })
+      .notNull()
+      .references(() => Member.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('createdAt').defaultNow().notNull(),
     updatedAt: timestamp('updatedAt')
       .defaultNow()
+      .notNull()
       .$onUpdate(() => new Date()),
   },
   table => ({
-    profileIdIndex: index('channel_profileId_idx').on(table.profileId),
     serverIdIndex: index('channel_serverId_idx').on(table.serverId),
+    memberIdIndex: index('channel_memberId_idx').on(table.memberId),
   })
 )
 
