@@ -126,52 +126,52 @@ export const Channel = pgTable(
 export const Message = pgTable(
   'message',
   {
-  id: varchar('id', { length: 12 })
-    .primaryKey()
-    .$defaultFn(() => generatePublicId()),
-  content: text('content').notNull(),
-  fileUrl: text('fileUrl'),
+    id: varchar('id', { length: 12 })
+      .primaryKey()
+      .$defaultFn(() => generatePublicId()),
+    content: text('content').notNull(),
+    fileUrl: text('fileUrl'),
     memberId: varchar('memberId', { length: 12 })
-    .notNull()
-    .references(() => Member.id, { onDelete: 'cascade' }),
-  channelId: text('channelId')
-    .notNull()
-    .references(() => Channel.id, { onDelete: 'cascade' }),
-  deleted: text('deleted').default('false'),
-  createdAt: timestamp('createdAt').defaultNow(),
-  updatedAt: timestamp('updatedAt')
-    .defaultNow()
-    .$onUpdate(() => new Date()),
+      .notNull()
+      .references(() => Member.id, { onDelete: 'cascade' }),
+    channelId: text('channelId')
+      .notNull()
+      .references(() => Channel.id, { onDelete: 'cascade' }),
+    deleted: text('deleted').default('false'),
+    createdAt: timestamp('createdAt').defaultNow(),
+    updatedAt: timestamp('updatedAt')
+      .defaultNow()
+      .$onUpdate(() => new Date()),
   },
   table => ({
     memberIdx: index().on(table.memberId),
     channelIdx: index().on(table.channelId),
-})
+  })
 )
 
 // Conversation Table
 export const Conversation = pgTable(
   'conversation',
   {
-  id: varchar('id', { length: 12 })
-    .primaryKey()
-    .$defaultFn(() => generatePublicId()),
+    id: varchar('id', { length: 12 })
+      .primaryKey()
+      .$defaultFn(() => generatePublicId()),
     memberOneId: varchar('memberOneId', { length: 12 })
-    .notNull()
-    .references(() => Member.id, { onDelete: 'cascade' }),
+      .notNull()
+      .references(() => Member.id, { onDelete: 'cascade' }),
     memberTwoId: varchar('memberTwoId', { length: 12 })
-    .notNull()
-    .references(() => Member.id, { onDelete: 'cascade' }),
-  createdAt: timestamp('createdAt').defaultNow(),
-  updatedAt: timestamp('updatedAt')
-    .defaultNow()
-    .$onUpdate(() => new Date()),
+      .notNull()
+      .references(() => Member.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('createdAt').defaultNow(),
+    updatedAt: timestamp('updatedAt')
+      .defaultNow()
+      .$onUpdate(() => new Date()),
   },
   table => ({
     membersUnique: unique().on(table.memberOneId, table.memberTwoId),
     member1Idx: index().on(table.memberOneId),
     member2Idx: index().on(table.memberTwoId),
-})
+  })
 )
 
 // DirectMessage Table
