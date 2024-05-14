@@ -1,8 +1,8 @@
 import { db } from '@/db'
-import { Channel, Member, Server } from '@/db/schema'
+import { Channel, Member } from '@/db/schema'
 import { getProfile } from '@/lib/getProfile'
 import { verifyChannelData } from '@/lib/utils'
-import { and, eq, exists, or } from 'drizzle-orm'
+import { and, eq, or } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest, { params }: { params: { serverId: string } }) {
@@ -22,30 +22,32 @@ export async function POST(req: NextRequest, { params }: { params: { serverId: s
     }
 
     //Verify the member in the server
-    const memberSql = db
+    const validMember = await db
       .select()
       .from(Member)
       .where(
         and(
           eq(Member.profileId, profile.id),
+          eq(Member.serverId, params.serverId),
           or(eq(Member.role, 'ADMIN'), eq(Member.role, 'MODERATOR'))
         )
       )
-    const [foundServer] = await db
-      .select()
-      .from(Server)
-      .where(and(eq(Server.id, params.serverId), exists(memberSql)))
+      .then(res => res[0])
 
-    if (!foundServer) {
-      return NextResponse.json({ error: 'Resource not found' }, { status: 404 })
+    if (!validMember) {
+      return NextResponse.json(
+        { error: 'You do not have permission to create a channel in this server' },
+        { status: 403 }
+      )
     }
 
-    const [createdChannel] = await db
+    const newChannel = await db
       .insert(Channel)
-      .values({ name, type, serverId: params.serverId, profileId: profile.id })
+      .values({ name, type, serverId: params.serverId, memberId: validMember.id })
       .returning()
+      .then(res => res[0])
 
-    return NextResponse.json(createdChannel)
+    return NextResponse.json(newChannel)
   } catch (error) {
     console.error('[--Create Channel Error--]', error)
     NextResponse.json({ error: 'Failed to create channel' }, { status: 500 })
