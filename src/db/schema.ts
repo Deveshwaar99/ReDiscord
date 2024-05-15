@@ -213,7 +213,8 @@ export const memberRelations = relations(Member, ({ one, many }) => ({
   server: one(Server, { fields: [Member.serverId], references: [Server.id] }),
   channels: many(Channel),
   messages: many(Message),
-  conversations: many(Conversation),
+  initiatedConversations: many(Conversation, { relationName: 'initiatedConversations' }),
+  receivedConversations: many(Conversation, { relationName: 'receivedConversations' }),
   directMessages: many(DirectMessage),
 }))
 
@@ -232,8 +233,16 @@ export const messageRelations = relations(Message, ({ one }) => ({
 
 // Conversation Relations
 export const conversationRelations = relations(Conversation, ({ one, many }) => ({
-  memberOne: one(Member, { fields: [Conversation.memberOneId], references: [Member.id] }),
-  memberTwo: one(Member, { fields: [Conversation.memberTwoId], references: [Member.id] }),
+  memberOne: one(Member, {
+    fields: [Conversation.memberOneId],
+    references: [Member.id],
+    relationName: 'initiatedConversations', // Relation name added
+  }),
+  memberTwo: one(Member, {
+    fields: [Conversation.memberTwoId],
+    references: [Member.id],
+    relationName: 'receivedConversations', // Relation name added
+  }),
   directMessages: many(DirectMessage),
 }))
 
