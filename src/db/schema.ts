@@ -24,7 +24,7 @@ export const Profile = pgTable(
       .$defaultFn(() => generatePublicId()),
     clerkId: text('clerkId').unique().notNull(),
     name: text('name').notNull(),
-    imageUrl: text('imageUrl'),
+    imageUrl: text('imageUrl').notNull(),
     email: text('email').unique().notNull(),
     createdAt: timestamp('createdAt').defaultNow().notNull(),
     updatedAt: timestamp('updatedAt')
