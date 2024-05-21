@@ -169,8 +169,7 @@ export const Conversation = pgTable(
   },
   table => ({
     membersUnique: unique().on(table.memberOneId, table.memberTwoId),
-    member1Idx: index().on(table.memberOneId),
-    member2Idx: index().on(table.memberTwoId),
+    membersCompositeIdx: index('members_composite_idx').on(table.memberOneId, table.memberTwoId),
   })
 )
 
