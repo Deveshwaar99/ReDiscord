@@ -24,13 +24,13 @@ import { useModalStore } from '@/hooks/useModalStore'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
 
 function EditServerModal() {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
   const { isOpen, type, onClose, data } = useModalStore()
@@ -68,26 +68,25 @@ function EditServerModal() {
   }, [server, form])
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      setIsLoading(true)
-      const isSameData = values.name === server?.name && values.imageUrl === server?.imageUrl
-
-      if (isSameData) {
-        return toast('No values changed')
-      }
-      const response = await axios.patch(`/api/servers/${server?.id}`, values)
-      if (response) {
-        toast.success('Server details updated successfully')
-      }
-      form.reset()
-      onClose()
-      router.refresh()
-    } catch (error) {
-      console.error('Edit server Error--', error)
-      toast.error('Somthing went wrong')
-    } finally {
-      setIsLoading(false)
+    const isSameData = values.name === server?.name && values.imageUrl === server?.imageUrl
+    if (isSameData) {
+      return toast('No values changed')
     }
+
+    startTransition(async () => {
+      try {
+        const response = await axios.patch(`/api/servers/${server?.id}`, values)
+        if (response) {
+          toast.success('Server details updated successfully')
+        }
+        form.reset()
+        onClose()
+        router.refresh()
+      } catch (error) {
+        console.error('Edit server Error--', error)
+        toast.error('Somthing went wrong')
+      }
+    })
   }
 
   function handleClose() {
@@ -148,7 +147,7 @@ function EditServerModal() {
 
               <DialogFooter className="pb-6">
                 <Button
-                  disabled={isLoading}
+                  disabled={isPending}
                   className="w-full bg-indigo-500 text-white hover:bg-indigo-500/90"
                 >
                   Save

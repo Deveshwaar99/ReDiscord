@@ -11,12 +11,12 @@ import {
 import { useModalStore } from '@/hooks/useModalStore'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useTransition } from 'react'
 import toast from 'react-hot-toast'
 import { Button } from '../ui/button'
 
 function DeleteChannelModal() {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   const { isOpen, type, onClose, data } = useModalStore()
   const { server, channel } = data
@@ -25,19 +25,17 @@ function DeleteChannelModal() {
   const router = useRouter()
 
   const handleDeleteChannel = async () => {
-    try {
-      console.log('calling delete channel')
-      setIsLoading(true)
-      await axios.delete(`/api/servers/${server?.id}/channels/${channel?.id}`)
-      toast(`You have deleted #${channel?.name}`, { icon: '🗑️' })
-      onClose()
-    } catch (error) {
-      toast.error('Failed to delete channel. Please try again.')
-      console.error('--Delete Channel Error--')
-    } finally {
-      setIsLoading(false)
-      router.refresh()
-    }
+    startTransition(async () => {
+      try {
+        await axios.delete(`/api/servers/${server?.id}/channels/${channel?.id}`)
+        router.refresh()
+        toast(`You have deleted #${channel?.name}`, { icon: '🗑️' })
+        onClose()
+      } catch (error) {
+        toast.error('Failed to delete channel. Please try again.')
+        console.error('--Delete Channel Error--')
+      }
+    })
   }
 
   return (
@@ -54,11 +52,11 @@ function DeleteChannelModal() {
         </DialogHeader>
         <DialogFooter className="mt-2 bg-gray-100 px-6 py-4 dark:bg-inherit">
           <div className="flex w-full items-center justify-between">
-            <Button disabled={isLoading} onClick={() => onClose()} variant="ghost">
+            <Button disabled={isPending} onClick={() => onClose()} variant="ghost">
               Cancel
             </Button>
             <Button
-              disabled={isLoading}
+              disabled={isPending}
               onClick={() => {
                 handleDeleteChannel()
               }}

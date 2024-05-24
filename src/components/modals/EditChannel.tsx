@@ -20,7 +20,7 @@ import { Input } from '@/components/ui/input'
 import { useModalStore } from '@/hooks/useModalStore'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -38,7 +38,7 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 
 function EditChannelModal() {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isPending, startTransition] = useTransition()
   const { isOpen, type, onClose, data } = useModalStore()
   const { server, channel } = data
   const isModalOpen = isOpen && type === 'edit-channel'
@@ -71,24 +71,23 @@ function EditChannelModal() {
   }, [form, channel])
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true)
     const isSameData = channel?.name === values.name && channel.type === values.type
-
-    try {
-      if (isSameData) {
-        return toast('No values changed')
-      }
-      await axios.patch(`/api/servers/${server?.id}/channels/${channel?.id}`, values)
-      toast.success('Channel Updated')
-      form.reset()
-      onClose()
-    } catch (error) {
-      toast.error('Unable to save!')
-      console.error('--Edit channel Error--', error)
-    } finally {
-      setIsLoading(false)
-      router.refresh()
+    if (isSameData) {
+      return toast('No values changed')
     }
+    startTransition(async () => {
+      try {
+        await axios.patch(`/api/servers/${server?.id}/channels/${channel?.id}`, values)
+        toast.success('Channel Updated')
+        form.reset()
+        onClose()
+      } catch (error) {
+        toast.error('Unable to save!')
+        console.error('--Edit channel Error--', error)
+      } finally {
+        router.refresh()
+      }
+    })
   }
 
   function handleClose() {
@@ -131,7 +130,7 @@ function EditChannelModal() {
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <Select disabled={isLoading} onValueChange={field.onChange} value={field.value}>
+                    <Select disabled={isPending} onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger className="border-0 bg-zinc-300/50 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-[#1e1f22] dark:text-[#dbdee1]">
                         <SelectValue placeholder="Select a channel type" />
                       </SelectTrigger>
@@ -153,7 +152,7 @@ function EditChannelModal() {
 
               <DialogFooter className="pb-6">
                 <Button
-                  disabled={isLoading}
+                  disabled={isPending}
                   className="w-full bg-indigo-500 text-white hover:bg-indigo-500/90"
                 >
                   Save
