@@ -135,7 +135,7 @@ function CreateServerModal() {
                   disabled={isPending}
                   className="w-full bg-indigo-500 text-white hover:bg-indigo-500/90"
                 >
-                  {isPending ? 'Creeating ...' : 'Create'}
+                  {isPending ? 'Creating Server...' : 'Create'}
                 </Button>
               </DialogFooter>
             </div>
