@@ -1,7 +1,7 @@
-import { Server as IoServer } from 'socket.io'
-import { Server as NetServer } from 'node:http'
-import { NextApiRequest, NextApiResponse } from 'next'
 import { Socket } from 'net'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { Server as NetServer } from 'node:http'
+import { Server as IoServer } from 'socket.io'
 
 export type NextApiResponseServerIo = NextApiResponse & {
   socket: Socket & { server: NetServer & { io: IoServer } }
@@ -13,10 +13,14 @@ export const config = {
   },
 }
 
-const ioHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
-  if (!res.socket.server.io) {
+const ioHandler = (_req: NextApiRequest, res: NextApiResponseServerIo) => {
+  if (res.socket.server.io) {
+    return console.log('Socket.io server already running')
+  } else {
     console.log('Socket is initializing')
+
     const httpServer = res.socket.server as NetServer
+
     const io = new IoServer(httpServer, {
       path: '/api/socket/io',
       addTrailingSlash: false,
@@ -36,9 +40,8 @@ const ioHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
     })
 
     res.socket.server.io = io // Attach io to the server instance
-  } else {
-    console.log('Socket.io server already running')
   }
+
   res.end()
 }
 
