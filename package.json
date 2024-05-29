@@ -42,6 +42,8 @@
     "react-hook-form": "^7.51.2",
     "react-hot-toast": "^2.4.1",
     "server-only": "^0.0.1",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
     "uploadthing": "^6.7.0",
