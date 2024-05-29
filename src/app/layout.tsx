@@ -6,6 +6,7 @@ import { ClerkProvider } from '@clerk/nextjs'
 import type { Metadata } from 'next'
 import { Open_Sans } from 'next/font/google'
 import './globals.css'
+import { SocketProvider } from '@/components/providers/socket-provider'
 
 const font = Open_Sans({ subsets: ['latin'] })
 
@@ -29,9 +30,11 @@ export default function RootLayout({
             enableSystem={false}
             disableTransitionOnChange
           >
-            {children}
+            <SocketProvider>
+              {children}
+              <ModalProvider />
+            </SocketProvider>
             <ToastProvider />
-            <ModalProvider />
           </ThemeProvider>
         </body>
       </html>
