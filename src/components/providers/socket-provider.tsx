@@ -1,21 +1,25 @@
 'use client'
+import { createContext, useContext, useEffect, useState } from 'react'
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
-import { io as ClientIo } from 'socket.io-client'
+import { io as ClientIo, type Socket } from 'socket.io-client'
 
-type SocketContextType = {
-  socket: any | null
+interface SocketContextType {
+  socket: Socket | null
   isConnected: boolean
 }
 
-const SocketContext = createContext<SocketContextType>({ socket: null, isConnected: false })
+const SocketContext = createContext<SocketContextType>({
+  socket: null,
+  isConnected: false,
+})
 
 export function SocketProvider({ children }: { children: React.ReactNode }) {
-  const [socket, setSocket] = useState<any | null>(null)
+  const [socket, setSocket] = useState<Socket | null>(null)
   const [isConnected, setIsConnected] = useState<boolean>(false)
 
   useEffect(() => {
-    const socketInstance = new (ClientIo as any)(process.env.NEXT_PUBLIC_SITE_URL, {
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    const socketInstance: Socket = ClientIo(process.env.NEXT_PUBLIC_SITE_URL!, {
       path: '/api/socket/io',
       addTrailingSlash: false,
     })
@@ -24,9 +28,9 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       console.log('Connected Socket')
       setIsConnected(true)
     })
+
     socketInstance.on('disconnect', () => {
       console.log('Disconnected socket')
-
       setIsConnected(false)
     })
 
@@ -36,6 +40,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       socketInstance.disconnect()
     }
   }, [])
+
   return <SocketContext.Provider value={{ socket, isConnected }}>{children}</SocketContext.Provider>
 }
 
