@@ -1,6 +1,6 @@
-import { Socket } from 'net'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { Server as NetServer } from 'node:http'
+import type { Server as NetServer } from 'node:http'
+import type { Socket } from 'node:net'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { Server as IoServer } from 'socket.io'
 
 export type NextApiResponseServerIo = NextApiResponse & {
@@ -15,11 +15,12 @@ export const config = {
 
 const ioHandler = (_req: NextApiRequest, res: NextApiResponseServerIo) => {
   if (res.socket.server.io) {
-    return console.log('Socket.io server already running')
+    console.log('Socket.io server already running')
   } else {
     console.log('Socket is initializing')
 
-    const httpServer = res.socket.server as NetServer
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    const httpServer: NetServer = res.socket.server as any
 
     const io = new IoServer(httpServer, {
       path: '/api/socket/io',
