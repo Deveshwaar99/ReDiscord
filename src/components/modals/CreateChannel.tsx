@@ -106,7 +106,6 @@ function CreateChannelModal() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="space-y-6 px-6">
-              <div className="flex items-center justify-center text-center"></div>
               <FormField
                 control={form.control}
                 name="name"
