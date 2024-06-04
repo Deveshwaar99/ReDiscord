@@ -20,7 +20,7 @@ import { Input } from '@/components/ui/input'
 import { useModalStore } from '@/hooks/useModalStore'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -38,7 +38,7 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 
 function CreateChannelModal() {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   const { isOpen, type, onClose, data } = useModalStore()
   const { server, channelType } = data
@@ -75,20 +75,18 @@ function CreateChannelModal() {
   }, [form, channelType])
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true)
-    console.log(values)
-    try {
-      await axios.post(`/api/servers/${server?.id}/channels`, values)
-      toast.success('Channel Created')
-      form.reset()
-      onClose()
-      router.refresh()
-    } catch (error) {
-      toast.error('Unable to create Channel!')
-      console.error(error)
-    } finally {
-      setIsLoading(false)
-    }
+    startTransition(async () => {
+      try {
+        await axios.post(`/api/servers/${server?.id}/channels`, values)
+        toast.success('Channel Created')
+        form.reset()
+        onClose()
+        router.refresh()
+      } catch (error) {
+        toast.error('Unable to create Channel!')
+        console.error(error)
+      }
+    })
   }
 
   function handleClose() {
@@ -130,7 +128,7 @@ function CreateChannelModal() {
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <Select disabled={isLoading} onValueChange={field.onChange} value={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger className="border-0 bg-zinc-300/50 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-[#1e1f22] dark:text-[#dbdee1]">
                         <SelectValue placeholder="Select a channel type" />
                       </SelectTrigger>
@@ -152,10 +150,10 @@ function CreateChannelModal() {
 
               <DialogFooter className="pb-6">
                 <Button
-                  disabled={isLoading}
+                  disabled={isPending}
                   className="w-full bg-indigo-500 text-white hover:bg-indigo-500/90"
                 >
-                  Create
+                  {isPending ? 'Creating Channel...' : 'Create'}
                 </Button>
               </DialogFooter>
             </div>

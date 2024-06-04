@@ -23,13 +23,13 @@ import { useModalStore } from '@/hooks/useModalStore'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
 
 function CreateServerModal() {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   const { isOpen, type, onClose } = useModalStore()
   const isModalOpen = isOpen && type === 'create-server'
@@ -60,25 +60,18 @@ function CreateServerModal() {
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true)
-    console.log(values)
-    try {
-      const { data } = await axios.post('/api/servers', values)
-      if (data.error) {
-        toast.error(data.error)
-        return console.error(data.error)
+    startTransition(async () => {
+      try {
+        await axios.post('/api/servers', values)
+        toast.success('Server Created')
+        form.reset()
+        onClose()
+        router.refresh()
+      } catch (error) {
+        toast.error('Unable to create Server!')
+        console.error(error)
       }
-      toast.success('Server Created')
-
-      form.reset()
-      onClose()
-      router.refresh()
-    } catch (error) {
-      toast.error('Unable to create Server!')
-      console.error(error)
-    } finally {
-      setIsLoading(false)
-    }
+    })
   }
 
   function handleClose() {
@@ -139,10 +132,10 @@ function CreateServerModal() {
 
               <DialogFooter className="pb-6">
                 <Button
-                  disabled={isLoading}
+                  disabled={isPending}
                   className="w-full bg-indigo-500 text-white hover:bg-indigo-500/90"
                 >
-                  Create
+                  {isPending ? 'Creating Server...' : 'Create'}
                 </Button>
               </DialogFooter>
             </div>
