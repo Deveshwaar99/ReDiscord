@@ -1,6 +1,6 @@
-import { SelectChannel, SelectServer } from '@/db/schema'
+import type { SelectChannel, SelectServer } from '@/db/schema'
 import { create } from 'zustand'
-import { ChannelTypes } from '../../types'
+import type { ChannelTypes } from '../../types'
 
 type ModalType =
   | 'create-server'
@@ -12,11 +12,14 @@ type ModalType =
   | 'delete-server'
   | 'delete-channel'
   | 'edit-channel'
+  | 'message-file'
 
 interface ModalData {
   server?: SelectServer
   channel?: SelectChannel
   channelType?: ChannelTypes
+  apiUrl?: string
+  query?: Record<string, string>
 }
 
 interface ModalStore {
