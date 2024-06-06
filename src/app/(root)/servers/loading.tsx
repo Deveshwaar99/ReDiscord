@@ -1,5 +1,5 @@
-import LoadingNavigationBar from '@/components/LoadingNavigationBar'
-import LoadingSidebar from '@/components/LoadingSidebar'
+import LoadingNavigationBar from '@/components/loading/LoadingNavigationBar'
+import LoadingSidebar from '@/components/loading/LoadingSidebar'
 
 function LoadingServerPage() {
   return (

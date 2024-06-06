@@ -1,4 +1,4 @@
-import LoadingNavigationBar from '@/components/LoadingNavigationBar'
+import LoadingNavigationBar from '@/components/loading/LoadingNavigationBar'
 
 function HomeLoadingPage() {
   return (
