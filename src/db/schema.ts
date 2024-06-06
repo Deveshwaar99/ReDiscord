@@ -174,9 +174,7 @@ export const Conversation = pgTable(
 
 // DirectMessage Table
 export const DirectMessage = pgTable('directMessage', {
-  id: varchar('id', { length: 12 })
-    .primaryKey()
-    .$defaultFn(() => generatePublicId()),
+  id: serial('id').primaryKey(),
   content: text('content').notNull(),
   fileUrl: text('fileUrl'),
   memberId: varchar('memberId', { length: 12 })
