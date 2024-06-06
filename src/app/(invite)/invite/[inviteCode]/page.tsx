@@ -23,14 +23,16 @@ async function InvitePage({ params }: { params: { inviteCode: string } }) {
     },
   })
 
-  if (existingServer && existingServer.members.length) {
+  if (existingServer?.members.length) {
     return redirect(`/servers/${existingServer.id}`)
   }
+
   if (existingServer) {
     const [newMember] = await db
       .insert(Member)
       .values({ profileId: profile.id, serverId: existingServer.id })
       .returning()
+
     if (newMember) {
       return redirect(`/servers/${newMember.serverId}`)
     }
