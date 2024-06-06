@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useModalStore } from '@/hooks/useModalStore'
 import { ChevronDown, LogOut, PlusCircle, Settings, Trash, UserPlus, Users } from 'lucide-react'
-import { ServerDetails } from '../../../types'
+import type { ServerDetails } from '../../../types'
 
 interface ServerSidebarHeaderProps {
   server: ServerDetails
@@ -24,7 +24,10 @@ function ServerSidebarHeader({ server, role }: ServerSidebarHeaderProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="focus:outline-none" asChild>
-        <button className="text-md flex h-12 w-full items-center border-b-2 border-neutral-200 px-3 font-semibold transition hover:bg-zinc-700/10 dark:border-neutral-800 dark:hover:bg-zinc-700/50">
+        <button
+          type="button"
+          className="text-md flex h-12 w-full items-center border-b-2 border-neutral-200 px-3 font-semibold transition hover:bg-zinc-700/10 dark:border-neutral-800 dark:hover:bg-zinc-700/50"
+        >
           {server.name}
           <ChevronDown className="ml-auto h-5 w-5" />
         </button>
