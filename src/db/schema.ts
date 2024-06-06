@@ -4,6 +4,7 @@ import {
   index,
   pgEnum,
   pgTable,
+  serial,
   text,
   timestamp,
   unique,
@@ -126,9 +127,7 @@ export const Channel = pgTable(
 export const Message = pgTable(
   'message',
   {
-    id: varchar('id', { length: 12 })
-      .primaryKey()
-      .$defaultFn(() => generatePublicId()),
+    id: serial('id').primaryKey(),
     content: text('content').notNull(),
     fileUrl: text('fileUrl'),
     memberId: varchar('memberId', { length: 12 })
