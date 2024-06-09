@@ -1,6 +1,7 @@
 import { generatePublicId } from '@/lib/generatePublicId'
 import { relations } from 'drizzle-orm'
 import {
+  boolean,
   index,
   pgEnum,
   pgTable,
@@ -136,9 +137,10 @@ export const Message = pgTable(
     channelId: text('channelId')
       .notNull()
       .references(() => Channel.id, { onDelete: 'cascade' }),
-    deleted: text('deleted').default('false'),
-    createdAt: timestamp('createdAt').defaultNow(),
+    deleted: boolean('deleted').notNull().default(false),
+    createdAt: timestamp('createdAt').notNull().defaultNow(),
     updatedAt: timestamp('updatedAt')
+      .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
@@ -255,5 +257,7 @@ export type SelectProfile = typeof Profile.$inferSelect
 export type SelectServer = typeof Server.$inferSelect
 export type SelectMember = typeof Member.$inferSelect
 export type SelectChannel = typeof Channel.$inferSelect
+export type SelectMessage = typeof Message.$inferSelect
+export type SelectConversation = typeof Conversation.$inferSelect
 
 export type channelEnum = typeof ChannelType.enumValues
