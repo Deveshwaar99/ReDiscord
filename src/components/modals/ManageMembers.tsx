@@ -1,5 +1,5 @@
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { SelectMember } from '@/db/schema'
+import type { SelectMember } from '@/db/schema'
 import { useModalStore } from '@/hooks/useModalStore'
 import axios from 'axios'
 import {
@@ -15,7 +15,7 @@ import {
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { ServerDetails } from '../../../types'
+import type { ServerDetails } from '../../../types'
 import UserAvatar from '../UserAvatar'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog'
 import {
@@ -33,7 +33,7 @@ import {
 const roleIconMap = {
   GUEST: null,
   MODERATOR: <ShieldCheck className="ml-2 h-4 w-4 text-indigo-500" />,
-  ADMIN: <ShieldAlert className="h-4 w-4 text-rose-500" />,
+  ADMIN: <ShieldAlert className="ml-2 h-4 w-4 text-rose-500" />,
 }
 
 function ManageMembersModal() {
