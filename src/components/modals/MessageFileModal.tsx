@@ -48,7 +48,7 @@ function MessageFileModal() {
 
     try {
       const url = qs.stringifyUrl({ url: apiUrl || '', query })
-      await axios.post(url, { content: values.fileUrl })
+      await axios.post(url, { content: '', fileUrl: values.fileUrl })
       handleClose()
       router.refresh()
     } catch (error) {
