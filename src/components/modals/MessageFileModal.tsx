@@ -1,4 +1,5 @@
 'use client'
+
 import FileUpload from '@/components/FileUpload'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,15 +15,16 @@ import { Form, FormControl, FormField, FormItem } from '@/components/ui/form'
 import { useModalStore } from '@/hooks/useModalStore'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
+import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import queryString from 'query-string'
-import { useState } from 'react'
+import { useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
 
 function MessageFileModal() {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   const { isOpen, type, onClose, data } = useModalStore()
   const isModalOpen = isOpen && type === 'message-file'
@@ -44,23 +46,21 @@ function MessageFileModal() {
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true)
-
-    try {
-      const url = queryString.stringifyUrl({ url: apiUrl || '', query })
-      const fileType = values.fileUrl.split('.').at(-1)
-      await axios.post(url, {
-        content: `${fileType ? fileType.toUpperCase() : 'UNKNOWN'} FILE`,
-        fileUrl: values.fileUrl,
-      })
-      handleClose()
-      router.refresh()
-    } catch (error) {
-      toast.error('Somthing went wrong!')
-      console.error(error)
-    } finally {
-      setIsLoading(false)
-    }
+    startTransition(async () => {
+      try {
+        const url = queryString.stringifyUrl({ url: apiUrl || '', query })
+        const fileType = values.fileUrl.split('.').at(-1)
+        await axios.post(url, {
+          content: `${fileType ? fileType.toUpperCase() : 'UNKNOWN'} FILE`,
+          fileUrl: values.fileUrl,
+        })
+        handleClose()
+        router.refresh()
+      } catch (error) {
+        toast.error('Somthing went wrong!')
+        console.error(error)
+      }
+    })
   }
 
   function handleClose() {
@@ -101,10 +101,10 @@ function MessageFileModal() {
 
               <DialogFooter className="pb-6">
                 <Button
-                  disabled={isLoading}
+                  disabled={isPending}
                   className="w-full bg-indigo-500 text-white hover:bg-indigo-500/90"
                 >
-                  Send
+                  {isPending ? <Loader2 className="size-5 animate-spin" /> : 'Send'}
                 </Button>
               </DialogFooter>
             </div>
