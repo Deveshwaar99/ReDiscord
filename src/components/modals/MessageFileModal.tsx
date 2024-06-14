@@ -15,7 +15,7 @@ import { useModalStore } from '@/hooks/useModalStore'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
-import qs from 'query-string'
+import queryString from 'query-string'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -47,8 +47,12 @@ function MessageFileModal() {
     setIsLoading(true)
 
     try {
-      const url = qs.stringifyUrl({ url: apiUrl || '', query })
-      await axios.post(url, { content: '', fileUrl: values.fileUrl })
+      const url = queryString.stringifyUrl({ url: apiUrl || '', query })
+      const fileType = values.fileUrl.split('.').at(-1)
+      await axios.post(url, {
+        content: `${fileType ? fileType.toUpperCase() : 'UNKNOWN'} FILE`,
+        fileUrl: values.fileUrl,
+      })
       handleClose()
       router.refresh()
     } catch (error) {
