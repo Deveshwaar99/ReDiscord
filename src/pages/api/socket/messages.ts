@@ -1,49 +1,43 @@
 import { db } from '@/db'
 import { Channel, Member, Message, Server } from '@/db/schema'
-import { getProfile } from '@/lib/getProfile'
+import { getProfilePages } from '@/lib/getProfile-pages'
 import { and, eq, exists } from 'drizzle-orm'
-import { NextResponse, type NextRequest } from 'next/server'
+import type { NextApiRequest } from 'next'
+import { NextResponse } from 'next/server'
 import { z } from 'zod'
+import type { NextApiResponseServerIo } from './io'
 
+const querySchema = z.object({ serverId: z.string().length(12), channelId: z.string().length(12) })
 const messageBodySchema = z.object({
   content: z.string().min(1),
   fileUrl: z.string().optional(),
 })
 
-export async function POST(req: NextRequest) {
+export async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
+
   try {
-    const profile = await getProfile()
+    const profile = await getProfilePages(req)
     if (!profile) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-    const searchParams = req.nextUrl.searchParams
-    const query = {
-      serverId: searchParams.get('serverId'),
-      channelId: searchParams.get('channelId'),
+      return res.status(401).json({ error: 'Unauthorized' })
     }
 
-    if (!query.serverId || !query.channelId) {
-      return NextResponse.json({ error: 'Missing required params' }, { status: 400 })
-    }
-
-    const validatedData = messageBodySchema.safeParse(await req.json())
-    if (!validatedData.success) {
-      return NextResponse.json({ error: 'Invalid input data' }, { status: 400 })
-    }
-
-    const body = validatedData.data
+    const query = querySchema.parse(req.query)
+    const body = messageBodySchema.parse(req.body)
 
     // [CHECK]: channel belongs to the server
     const channelExistsInServer = db
       .select()
       .from(Channel)
-      .where(and(eq(Channel.id, query.channelId), eq(Channel.serverId, Server.id)))
+      .where(and(eq(Channel.id, query.channelId), eq(Channel.serverId, query.serverId)))
 
     const serverWithMember = await db
       .select()
       .from(Server)
       .where(and(eq(Server.id, query.serverId), exists(channelExistsInServer)))
-      .innerJoin(Member, and(eq(Member.serverId, Server.id), eq(Member.profileId, profile.id))) //Verify member belongs to the  server
+      .innerJoin(Member, and(eq(Member.profileId, profile.id), eq(Member.serverId, Server.id))) //Verify member belongs to the  server
       .then(res => res[0])
 
     if (!serverWithMember || !serverWithMember.server || !serverWithMember.member) {
@@ -61,8 +55,14 @@ export async function POST(req: NextRequest) {
       .returning()
       .then(res => res[0])
 
-    return NextResponse.json({ message }, { status: 200 })
+    const channelKey = `chat:${query.channelId}:messages`
+    res?.socket?.server?.io?.emit(channelKey, message)
+
+    return res.status(200).send('OK')
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: error.flatten().fieldErrors })
+    }
     console.error('[MESSAGES_POST]', error)
     return NextResponse.json({ error: 'Internal Server error' }, { status: 500 })
   }
