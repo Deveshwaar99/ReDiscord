@@ -1,4 +1,4 @@
-import { SelectChannel, SelectMember, SelectProfile, SelectServer } from '@/db/schema'
+import type { SelectChannel, SelectMember, SelectProfile, SelectServer } from '@/db/schema'
 
 export type MembersWithProfile = SelectMember & { profile: SelectProfile }
 
@@ -17,4 +17,18 @@ export enum MemberRoles {
   ADMIN = 'ADMIN',
   MODERATOR = 'MODERATOR',
   GUEST = 'GUEST',
+}
+
+export type MessageWithMemberAndProfile = {
+  messageId: number
+  content: string
+  fileUrl: string | null
+  deleted: boolean
+  createdAt: Date
+  updatedAt: Date
+  channelId: string
+  memberId: string
+  memberRole: 'ADMIN' | 'MODERATOR' | 'GUEST'
+  profileName: string
+  profileImage: string
 }
