@@ -1,4 +1,4 @@
-import { db } from '@/db'
+import { db } from '@/db/pages-index'
 import { Channel, Member, Message, Server } from '@/db/schema'
 import { getProfilePages } from '@/lib/getProfile-pages'
 import { and, eq, exists } from 'drizzle-orm'
