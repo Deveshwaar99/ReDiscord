@@ -41,7 +41,7 @@ function DeleteMessageModal() {
       <DialogOverlay className="bg-transparent" />
       <DialogContent className="overflow-hidden border-none bg-white p-0 text-primary dark:bg-[#313338]">
         <DialogHeader className="px-6 pt-8">
-          <DialogTitle className="text-center text-2xl font-bold">Delete Server</DialogTitle>
+          <DialogTitle className="text-center text-2xl font-bold">Delete Message</DialogTitle>
           <DialogDescription className="text-center">
             Are you sure you want to do this ?<br />
             The message will be permanently deleted
