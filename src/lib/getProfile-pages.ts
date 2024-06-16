@@ -1,4 +1,4 @@
-import { db } from '@/db/index'
+import { db } from '@/db/pages-index'
 import { Profile, type SelectProfile } from '@/db/schema'
 import { getAuth } from '@clerk/nextjs/server'
 import { eq } from 'drizzle-orm'
