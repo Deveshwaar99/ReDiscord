@@ -8,10 +8,12 @@ import { MemberRoles } from '../../../../../types'
 import type { NextApiResponseServerIo } from '../io'
 
 const schema = z.object({
-  messageId: z.number(),
+  messageId: z
+    .string()
+    // biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
+    .refine((input: string) => !isNaN(Number(input)), { message: 'Invialid message id' }),
   serverId: z.string().length(12),
   channelId: z.string().length(12),
-  content: z.string().min(1),
 })
 
 async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
@@ -24,11 +26,16 @@ async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
     if (!profile) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
-    const { messageId, serverId, channelId, content } = schema.parse({
+    const {
+      messageId: MessageIdString,
+      serverId,
+      channelId,
+    } = schema.parse({
       ...req.query,
       messageId: Number(req.query.messageId),
-      content: req.body.content,
     })
+
+    const messageId = Number(MessageIdString)
 
     const serverWithMember = await db
       .select({ member: Member })
@@ -82,6 +89,7 @@ async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
 
     //Only the owner can EDIT
     if (req.method === 'PATCH') {
+      const { content } = z.object({ content: z.string().min(1) }).parse({ ...req.body })
       if (!isOwner) {
         return res.status(401).json({ error: 'Unauthorized' })
       }
@@ -99,7 +107,7 @@ async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
     return res.status(200).send('OK')
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: error.flatten() })
+      return res.status(400).json({ error: error.flatten().fieldErrors })
     }
 
     console.error('[MESSAGE_EDIT|DELETE]', error)
