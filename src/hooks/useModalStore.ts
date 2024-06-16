@@ -13,6 +13,7 @@ type ModalType =
   | 'delete-channel'
   | 'edit-channel'
   | 'message-file'
+  | 'delete-message'
 
 interface ModalData {
   server?: SelectServer
