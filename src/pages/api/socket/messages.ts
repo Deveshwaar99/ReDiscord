@@ -3,7 +3,6 @@ import { Channel, Member, Message, Server } from '@/db/schema'
 import { getProfilePages } from '@/lib/getProfile-pages'
 import { and, eq, exists } from 'drizzle-orm'
 import type { NextApiRequest } from 'next'
-import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import type { NextApiResponseServerIo } from './io'
 
@@ -13,7 +12,7 @@ const messageBodySchema = z.object({
   fileUrl: z.string().optional(),
 })
 
-export async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
+export default async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -26,7 +25,6 @@ export async function handler(req: NextApiRequest, res: NextApiResponseServerIo)
 
     const query = querySchema.parse(req.query)
     const body = messageBodySchema.parse(req.body)
-
     // [CHECK]: channel belongs to the server
     const channelExistsInServer = db
       .select()
@@ -41,7 +39,7 @@ export async function handler(req: NextApiRequest, res: NextApiResponseServerIo)
       .then(res => res[0])
 
     if (!serverWithMember || !serverWithMember.server || !serverWithMember.member) {
-      return NextResponse.json({ error: 'Server, member, or channel not found' }, { status: 404 })
+      return res.status(404).json({ error: 'Server, member, or channel not found' })
     }
 
     const message = await db
@@ -64,6 +62,6 @@ export async function handler(req: NextApiRequest, res: NextApiResponseServerIo)
       return res.status(400).json({ error: error.flatten().fieldErrors })
     }
     console.error('[MESSAGES_POST]', error)
-    return NextResponse.json({ error: 'Internal Server error' }, { status: 500 })
+    return res.status(500).json({ error: 'Internal Server error' })
   }
 }
