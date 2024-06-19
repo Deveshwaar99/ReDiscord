@@ -1,10 +1,10 @@
 import { db } from '@/db/pages-index'
-import { Channel, Member, Message, Server } from '@/db/schema'
+import { Channel, Member, Message, type SelectMessage, Server, Profile } from '@/db/schema'
 import { getProfilePages } from '@/lib/getProfile-pages'
 import { and, eq } from 'drizzle-orm'
 import type { NextApiRequest } from 'next'
 import { z } from 'zod'
-import { MemberRoles } from '../../../../../types'
+import { MemberRoles, type MessageWithMemberAndProfile } from '../../../../../types'
 import type { NextApiResponseServerIo } from '../io'
 
 const schema = z.object({
@@ -26,20 +26,17 @@ async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
     if (!profile) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
-    const {
-      messageId: MessageIdString,
-      serverId,
-      channelId,
-    } = schema.parse({
+    const query = schema.parse({
       ...req.query,
     })
 
-    const messageId = Number(MessageIdString)
+    const messageId = Number(query.messageId) // Message id is of type number in db
 
+    //Check whether the authenticated [Profile] belongs to the [Server] and is a valid [Member] of the Server
     const serverWithMember = await db
       .select({ member: Member })
       .from(Server)
-      .where(eq(Server.id, serverId))
+      .where(eq(Server.id, query.serverId))
       .innerJoin(Member, and(eq(Member.serverId, Server.id), eq(Member.profileId, profile.id)))
       .then(res => res[0])
 
@@ -47,10 +44,11 @@ async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
       return res.status(404).json({ error: 'Server or member not found' })
     }
 
+    //Check whether Channel belongs to the Server & get the [Message] that belongs to the channel with [messageOwner,messageOwnerProfile]
     const channelWithMessage = await db
-      .select({ message: Message })
+      .select({ message: Message, member: Member, profile: Profile })
       .from(Channel)
-      .where(and(eq(Channel.id, channelId), eq(Channel.serverId, serverId)))
+      .where(and(eq(Channel.id, query.channelId), eq(Channel.serverId, query.serverId)))
       .innerJoin(
         Message,
         and(
@@ -59,32 +57,26 @@ async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
           eq(Message.deleted, false),
         ),
       )
+      .innerJoin(Member, eq(Member.id, Message.memberId))
+      .innerJoin(Profile, eq(Profile.id, Member.profileId))
       .then(res => res[0])
 
     if (!channelWithMessage) {
       return res.status(404).json({ error: 'Channel or message not found' })
     }
 
-    const isOwner = serverWithMember.member.id === channelWithMessage.message.memberId
+    const isOwner = serverWithMember.member.id === channelWithMessage.message.memberId //Owner can EDIT/DELETE the message
+
     const isAdminOrModerator = [MemberRoles.ADMIN, MemberRoles.MODERATOR].includes(
       serverWithMember.member.role as MemberRoles,
-    )
+    ) //  Admin/Moderator can DELETE the message
 
     const canModify = isOwner || isAdminOrModerator
     if (!canModify) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 
-    let modifiedMessage: unknown
-
-    if (req.method === 'DELETE') {
-      modifiedMessage = await db
-        .update(Message)
-        .set({ deleted: true, content: 'This message has been deleted', fileUrl: null })
-        .where(eq(Message.id, messageId))
-        .returning()
-        .then(res => res[0])
-    }
+    let modifiedMessage: SelectMessage | null = null
 
     //Only the owner can EDIT
     if (req.method === 'PATCH') {
@@ -100,8 +92,36 @@ async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
         .then(res => res[0])
     }
 
-    const updateKey = `chat:${channelId}:messages:update`
-    res?.socket?.server?.io?.emit(updateKey, modifiedMessage)
+    if (req.method === 'DELETE') {
+      modifiedMessage = await db
+        .update(Message)
+        .set({ deleted: true, content: 'This message has been deleted', fileUrl: null })
+        .where(eq(Message.id, messageId))
+        .returning()
+        .then(res => res[0])
+    }
+
+    //  To satisfy typescript
+    if (!modifiedMessage) {
+      throw new Error('Modified message not found')
+    }
+
+    const messageWithMemberAndProfile: MessageWithMemberAndProfile = {
+      messageId: modifiedMessage.id,
+      content: modifiedMessage.content,
+      fileUrl: modifiedMessage.fileUrl,
+      deleted: modifiedMessage.deleted,
+      createdAt: modifiedMessage.createdAt,
+      updatedAt: modifiedMessage.updatedAt,
+      channelId: query.channelId,
+      memberId: channelWithMessage.member.id,
+      memberRole: MemberRoles[channelWithMessage.member.role],
+      profileName: channelWithMessage.profile.name,
+      profileImage: channelWithMessage.profile.imageUrl,
+    }
+
+    const updateKey = `chat:${query.channelId}:messages:update`
+    res?.socket?.server?.io?.emit(updateKey, messageWithMemberAndProfile)
 
     return res.status(200).send('OK')
   } catch (error) {

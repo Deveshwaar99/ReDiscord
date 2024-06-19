@@ -5,6 +5,7 @@ import { and, eq, exists } from 'drizzle-orm'
 import type { NextApiRequest } from 'next'
 import { z } from 'zod'
 import type { NextApiResponseServerIo } from './io'
+import type { MessageWithMemberAndProfile } from '../../../../types'
 
 const querySchema = z.object({ serverId: z.string().length(12), channelId: z.string().length(12) })
 const messageBodySchema = z.object({
@@ -53,8 +54,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
       .returning()
       .then(res => res[0])
 
+    const messageWithMemberAndProfile: MessageWithMemberAndProfile = {
+      messageId: message.id,
+      content: message.content,
+      fileUrl: message.fileUrl,
+      deleted: message.deleted,
+      createdAt: message.createdAt,
+      updatedAt: message.updatedAt,
+      channelId: query.channelId,
+      memberId: serverWithMember.member.id,
+      memberRole: serverWithMember.member.role,
+      profileName: profile.name,
+      profileImage: profile.imageUrl,
+    }
     const channelKey = `chat:${query.channelId}:messages`
-    res?.socket?.server?.io?.emit(channelKey, message)
+    res?.socket?.server?.io?.emit(channelKey, messageWithMemberAndProfile)
 
     return res.status(200).send('OK')
   } catch (error) {
