@@ -37,22 +37,22 @@ function ServerSearch({ data }: ServerSearchProps) {
   }, [])
 
   const onClick = ({ id, type }: { id: string; type: 'channel' | 'member' }) => {
-    console.log('calling')
     setIsOpen(false)
 
     if (!id || !type) return
 
     if (type === 'channel') {
-      return router.push(`/servers/${params.serverId}/channels/${id}`)
+      return router.push(`/servers/${params?.serverId}/channels/${id}`)
     }
     if (type === 'member') {
-      return router.push(`/servers/${params.serverId}/conversations/${id}`)
+      return router.push(`/servers/${params?.serverId}/conversations/${id}`)
     }
   }
 
   return (
     <>
       <button
+        type="button"
         onClick={() => setIsOpen(isOpen => !isOpen)}
         className="group flex w-full items-center gap-x-2 rounded-md px-2 py-2 hover:bg-zinc-700/10 dark:hover:bg-zinc-500/50"
       >
