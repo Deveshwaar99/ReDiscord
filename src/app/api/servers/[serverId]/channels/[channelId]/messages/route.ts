@@ -10,6 +10,17 @@ const batchSize = 10
 const paramsSchema = z.object({
   serverId: z.string().length(12),
   channelId: z.string().length(12),
+  cursor: z
+    .union([
+      z.number(),
+      z.string().transform(input => {
+        const parsed = Number.parseInt(input, 10)
+        // biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
+        return isNaN(parsed) ? undefined : parsed
+      }),
+    ])
+    .optional()
+    .catch(undefined),
 })
 
 export async function GET(
@@ -27,8 +38,7 @@ export async function GET(
     }
 
     const searchParams = req.nextUrl.searchParams
-    const cursor = Number(searchParams.get('cursor'))
-    params = paramsSchema.parse({ ...params })
+    const urlParams = paramsSchema.parse({ ...params, cursor: searchParams.get('cursor') })
 
     const messageWithMemberAndProfile = await db
       .select({
@@ -46,8 +56,8 @@ export async function GET(
       })
       .from(Message)
       .where(
-        cursor
-          ? and(eq(Message.channelId, params.channelId), lt(Message.id, cursor))
+        urlParams?.cursor
+          ? and(eq(Message.channelId, params.channelId), lt(Message.id, urlParams.cursor))
           : eq(Message.channelId, params.channelId),
       )
       .orderBy(desc(Message.id))
