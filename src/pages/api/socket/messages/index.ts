@@ -4,12 +4,15 @@ import { getProfilePages } from '@/lib/getProfile-pages'
 import { and, eq, exists } from 'drizzle-orm'
 import type { NextApiRequest } from 'next'
 import { z } from 'zod'
-import type { NextApiResponseServerIo } from './io'
-import type { MessageWithMemberAndProfile } from '../../../../types'
+import type { NextApiResponseServerIo } from '../io'
+import type { MessageWithMemberAndProfile } from '../../../../../types'
 
-const querySchema = z.object({ serverId: z.string().length(12), channelId: z.string().length(12) })
+const querySchema = z.object({
+  serverId: z.string().length(12, { message: 'Invalid serverId' }),
+  channelId: z.string().length(12, { message: 'Invalid channelId' }),
+})
 const messageBodySchema = z.object({
-  content: z.string().min(1),
+  content: z.string().min(1, { message: 'content is missing' }),
   fileUrl: z.string().optional(),
 })
 
@@ -26,6 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
 
     const query = querySchema.parse(req.query)
     const body = messageBodySchema.parse(req.body)
+
     // [CHECK]: channel belongs to the server
     const channelExistsInServer = db
       .select()
