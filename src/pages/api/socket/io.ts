@@ -14,7 +14,7 @@ export const config = {
 }
 
 const ioHandler = (_req: NextApiRequest, res: NextApiResponseServerIo) => {
-  if (res.socket.server.io) {
+  if (res?.socket?.server?.io) {
     console.log('Socket.io server already running')
   } else {
     console.log('Socket is initializing')
