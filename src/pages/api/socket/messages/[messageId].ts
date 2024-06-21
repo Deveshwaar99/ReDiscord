@@ -7,14 +7,16 @@ import { z } from 'zod'
 import { MemberRoles, type MessageWithMemberAndProfile } from '../../../../../types'
 import type { NextApiResponseServerIo } from '../io'
 
-const schema = z.object({
+const paramsSchema = z.object({
   messageId: z
     .string()
     // biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
-    .refine((input: string) => !isNaN(Number(input)), { message: 'Invialid message id' }),
-  serverId: z.string().length(12),
-  channelId: z.string().length(12),
+    .refine((input: string) => !isNaN(Number(input)), { message: 'Invialid message id' })
+    .transform(input => Number.parseInt(input, 10)),
+  serverId: z.string().length(12, { message: 'Invialid serverId' }),
+  channelId: z.string().length(12, { message: 'Invialid channelId' }),
 })
+const contentSchema = z.object({ content: z.string().min(1, { message: 'content is missing' }) })
 
 async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
   if (req.method !== 'PATCH' && req.method !== 'DELETE') {
@@ -26,17 +28,15 @@ async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
     if (!profile) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
-    const query = schema.parse({
+    const urlParams = paramsSchema.parse({
       ...req.query,
     })
-
-    const messageId = Number(query.messageId) // Message id is of type number in db
 
     //Check whether the authenticated [Profile] belongs to the [Server] and is a valid [Member] of the Server
     const serverWithMember = await db
       .select({ member: Member })
       .from(Server)
-      .where(eq(Server.id, query.serverId))
+      .where(eq(Server.id, urlParams.serverId))
       .innerJoin(Member, and(eq(Member.serverId, Server.id), eq(Member.profileId, profile.id)))
       .then(res => res[0])
 
@@ -48,11 +48,11 @@ async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
     const channelWithMessage = await db
       .select({ message: Message, member: Member, profile: Profile })
       .from(Channel)
-      .where(and(eq(Channel.id, query.channelId), eq(Channel.serverId, query.serverId)))
+      .where(and(eq(Channel.id, urlParams.channelId), eq(Channel.serverId, urlParams.serverId)))
       .innerJoin(
         Message,
         and(
-          eq(Message.id, messageId),
+          eq(Message.id, urlParams.messageId),
           eq(Message.channelId, Channel.id),
           eq(Message.deleted, false),
         ),
@@ -80,14 +80,14 @@ async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
 
     //Only the owner can EDIT
     if (req.method === 'PATCH') {
-      const { content } = z.object({ content: z.string().min(1) }).parse({ ...req.body })
+      const { content } = contentSchema.parse({ ...req.body })
       if (!isOwner) {
         return res.status(401).json({ error: 'Unauthorized' })
       }
       modifiedMessage = await db
         .update(Message)
         .set({ content })
-        .where(eq(Message.id, messageId))
+        .where(eq(Message.id, urlParams.messageId))
         .returning()
         .then(res => res[0])
     }
@@ -96,7 +96,7 @@ async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
       modifiedMessage = await db
         .update(Message)
         .set({ deleted: true, content: 'This message has been deleted', fileUrl: null })
-        .where(eq(Message.id, messageId))
+        .where(eq(Message.id, urlParams.messageId))
         .returning()
         .then(res => res[0])
     }
@@ -113,14 +113,14 @@ async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
       deleted: modifiedMessage.deleted,
       createdAt: modifiedMessage.createdAt,
       updatedAt: modifiedMessage.updatedAt,
-      channelId: query.channelId,
+      channelId: urlParams.channelId,
       memberId: channelWithMessage.member.id,
       memberRole: MemberRoles[channelWithMessage.member.role],
       profileName: channelWithMessage.profile.name,
       profileImage: channelWithMessage.profile.imageUrl,
     }
 
-    const updateKey = `chat:${query.channelId}:messages:update`
+    const updateKey = `chat:${urlParams.channelId}:messages:update`
     res?.socket?.server?.io?.emit(updateKey, messageWithMemberAndProfile)
 
     return res.status(200).send('OK')
