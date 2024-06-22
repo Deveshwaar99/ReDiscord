@@ -4,34 +4,37 @@ import NavigationItem from '@/components/navigation/NavigationItem'
 import NavigiationAction from '@/components/navigation/NavigiationAction'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { db } from '@/db'
-import { Member, Server } from '@/db/schema'
+import { Member, SelectServer, Server } from '@/db/schema'
 import { getProfile } from '@/lib/getProfile'
 import { UserButton, redirectToSignIn } from '@clerk/nextjs'
-import { and, asc, eq, exists, ne } from 'drizzle-orm'
+import { asc, eq } from 'drizzle-orm'
+import { MemberRoles } from '../../../types'
 
 async function NavigationSidebar() {
   const profile = await getProfile()
   if (!profile) {
     return redirectToSignIn()
   }
-  const ownedServers = await db.query.Server.findMany({
-    where: eq(Server.profileId, profile.id),
-    orderBy: (Server, { asc }) => [asc(Server.createdAt)],
-  })
 
-  const memberSq = db
+  const membersWithServers = await db
     .select()
     .from(Member)
-    .where(and(eq(Member.profileId, profile.id), eq(Member.serverId, Server.id)))
-
-  const memberServers = await db
-    .select()
-    .from(Server)
-    .where(and(ne(Server.profileId, profile.id), exists(memberSq)))
+    .where(eq(Member.profileId, profile.id))
+    .innerJoin(Server, eq(Server.id, Member.serverId))
     .orderBy(asc(Server.createdAt))
 
-  const servers = [...ownedServers, ...memberServers]
+  let ownedServers: SelectServer[] = []
+  let memberServers: SelectServer[] = []
 
+  membersWithServers.forEach(({ member, server }) => {
+    if (member.role === MemberRoles.ADMIN) {
+      ownedServers.push(server)
+    } else {
+      memberServers.push(server)
+    }
+  })
+
+  const servers = [...ownedServers, ...memberServers]
   return (
     <div className="flex h-full w-full flex-col items-center space-y-4 bg-[#E3E5E8] py-3 text-primary dark:bg-[#1E1F22]">
       <NavigiationAction />
