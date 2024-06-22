@@ -13,16 +13,16 @@ import { Input } from '../ui/input'
 import EmojiPicker from './EmojiPicker'
 
 type ChatInputProps = {
-  socketUrl: string
-  query: Record<string, string>
   name: string
   type: 'conversation' | 'channel'
+  socketUrl: string
+  socketQuery: Record<string, string>
 }
 
 const formSchema = z.object({
   content: z.string().min(1),
 })
-function ChatInput({ socketUrl, query, name, type }: ChatInputProps) {
+function ChatInput({ name, type, socketUrl, socketQuery }: ChatInputProps) {
   const { onOpen } = useModalStore()
   const router = useRouter()
   const form = useForm<z.infer<typeof formSchema>>({
@@ -36,7 +36,7 @@ function ChatInput({ socketUrl, query, name, type }: ChatInputProps) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const url = qs.stringifyUrl({ url: socketUrl, query })
+      const url = qs.stringifyUrl({ url: socketUrl, query: socketQuery })
       await axios.post(url, values)
       form.reset()
       router.refresh()
@@ -58,7 +58,7 @@ function ChatInput({ socketUrl, query, name, type }: ChatInputProps) {
                   <button
                     type="button"
                     onClick={() => {
-                      onOpen('message-file', { query, apiUrl: socketUrl })
+                      onOpen('message-file', { query: socketQuery, apiUrl: socketUrl })
                     }}
                     className="absolute left-8 top-7 flex size-[24px] items-center justify-center rounded-full bg-zinc-500 p-1 transition hover:bg-zinc-600 dark:bg-zinc-400 dark:hover:bg-zinc-300"
                   >
