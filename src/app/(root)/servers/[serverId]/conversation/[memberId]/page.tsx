@@ -1,4 +1,6 @@
 import ChatHeader from '@/components/chat/ChatHeader'
+import ChatInput from '@/components/chat/ChatInput'
+import ChatMessages from '@/components/chat/ChatMessages'
 import { db } from '@/db'
 import { Member } from '@/db/schema'
 import { getOrCreateConversation } from '@/lib/conversations'
@@ -48,6 +50,33 @@ async function MemberIdPage({ params }: { params: { serverId: string; memberId: 
         name={memberTwo.profile.name}
         imageUrl={memberTwo.profile.imageUrl}
         type="conversation"
+      />
+      <ChatMessages
+        apiUrl={`/api/servers/${params.serverId}/conversation/${params.memberId}/direct-messages`}
+        chatId={conversation.id}
+        name={memberTwo.profile.name}
+        type="conversation"
+        member={memberOne}
+        paramKey="conversationId"
+        paramValue={conversation.id}
+        socketUrl="/api/socket/direct-messages"
+        socketQuery={{
+          serverId: params.serverId,
+          conversationId: conversation.id,
+          memberOneId: memberOne.id,
+          memberTwoId: memberTwo.id,
+        }}
+      />
+      <ChatInput
+        name={memberTwo.profile.name}
+        type="conversation"
+        socketUrl="/api/socket/direct-messages"
+        socketQuery={{
+          serverId: params.serverId,
+          conversationId: conversation.id,
+          memberOneId: memberOne.id,
+          memberTwoId: memberTwo.id,
+        }}
       />
     </div>
   )
