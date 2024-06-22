@@ -185,11 +185,12 @@ export const DirectMessage = pgTable('directMessage', {
   conversationId: text('conversationId')
     .notNull()
     .references(() => Conversation.id, { onDelete: 'cascade' }),
-  deleted: text('deleted').default('false'),
-  createdAt: timestamp('createdAt').defaultNow(),
+  deleted: boolean('deleted').notNull().default(false),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
   updatedAt: timestamp('updatedAt')
     .defaultNow()
-    .$onUpdate(() => new Date()),
+    .$onUpdate(() => new Date())
+    .notNull(),
 })
 
 // Profile Relations
@@ -259,5 +260,6 @@ export type SelectMember = typeof Member.$inferSelect
 export type SelectChannel = typeof Channel.$inferSelect
 export type SelectMessage = typeof Message.$inferSelect
 export type SelectConversation = typeof Conversation.$inferSelect
+export type selectDirectMessage = typeof DirectMessage.$inferSelect
 
 export type channelEnum = typeof ChannelType.enumValues
