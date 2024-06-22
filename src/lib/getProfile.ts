@@ -1,15 +1,19 @@
 import 'server-only'
 
-import { db } from '@/db/index'
-import { Profile } from '@/db/schema'
+import { db } from '@/db'
+import { Profile, type SelectProfile } from '@/db/schema'
 import { auth } from '@clerk/nextjs'
 import { eq } from 'drizzle-orm'
+import { cache } from 'react'
 
-export async function getProfile() {
+export const getProfile = cache(async (): Promise<SelectProfile | null> => {
   const { userId } = auth()
 
   if (!userId) return null
 
-  const [profile] = await db.select().from(Profile).where(eq(Profile.clerkId, userId))
-  return profile
-}
+  return await db
+    .select()
+    .from(Profile)
+    .where(eq(Profile.clerkId, userId))
+    .then(res => res[0])
+})
