@@ -1,4 +1,6 @@
 import ChatHeader from '@/components/chat/ChatHeader'
+import ChatInput from '@/components/chat/ChatInput'
+import ChatMessages from '@/components/chat/ChatMessages'
 import { db } from '@/db'
 import { Channel, Member } from '@/db/schema'
 import { getProfile } from '@/lib/getProfile'
@@ -6,14 +8,14 @@ import { redirectToSignIn } from '@clerk/nextjs'
 import { and, eq } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 
-interface ChannelIdProps {
+interface ChannelPageProps {
   params: {
     serverId: string
     channelId: string
   }
 }
 
-async function ChannelIdPage({ params }: ChannelIdProps) {
+async function ChannelPage({ params }: ChannelPageProps) {
   const profile = await getProfile()
   if (!profile) {
     return redirectToSignIn()
@@ -41,10 +43,33 @@ async function ChannelIdPage({ params }: ChannelIdProps) {
 
   return (
     <div className="flex h-full flex-col bg-white dark:bg-[#313338]">
-      <ChatHeader serverId={params.serverId} name={channel.name} type="channel" />
-      ChannelIdPage
+      <ChatHeader
+        serverId={params.serverId}
+        name={channel.name}
+        type="channel"
+        // imageUrl={profile.imageUrl}
+      />
+
+      <ChatMessages
+        apiUrl={`/api/servers/${params.serverId}/channels/${params.channelId}/messages`}
+        chatId={channel.id}
+        name={channel.name}
+        type="channel"
+        member={member}
+        paramKey="channelId"
+        paramValue={channel.id}
+        socketUrl="/api/socket/messages"
+        socketQuery={{ serverId: params.serverId, channelId: params.channelId }}
+      />
+
+      <ChatInput
+        name={channel.name}
+        type="channel"
+        socketUrl="/api/socket/messages"
+        socketQuery={{ serverId: params.serverId, channelId: params.channelId }}
+      />
     </div>
   )
 }
 
-export default ChannelIdPage
+export default ChannelPage
