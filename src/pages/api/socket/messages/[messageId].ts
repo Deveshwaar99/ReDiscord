@@ -6,6 +6,7 @@ import type { NextApiRequest } from 'next'
 import { z } from 'zod'
 import { MemberRoles, type MessageWithMemberAndProfile } from '../../../../../types'
 import type { NextApiResponseServerIo } from '../io'
+import { createMessageObject } from '@/lib/utils'
 
 const paramsSchema = z.object({
   messageId: z
@@ -106,19 +107,11 @@ async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
       throw new Error('Modified message not found')
     }
 
-    const messageWithMemberAndProfile: MessageWithMemberAndProfile = {
-      messageId: modifiedMessage.id,
-      content: modifiedMessage.content,
-      fileUrl: modifiedMessage.fileUrl,
-      deleted: modifiedMessage.deleted,
-      createdAt: modifiedMessage.createdAt,
-      updatedAt: modifiedMessage.updatedAt,
-      channelId: urlParams.channelId,
-      memberId: channelWithMessage.member.id,
-      memberRole: MemberRoles[channelWithMessage.member.role],
-      profileName: channelWithMessage.profile.name,
-      profileImage: channelWithMessage.profile.imageUrl,
-    }
+    const messageWithMemberAndProfile: MessageWithMemberAndProfile = createMessageObject({
+      message: modifiedMessage,
+      member: channelWithMessage.member,
+      profile: channelWithMessage.profile,
+    })
 
     const updateKey = `chat:${urlParams.channelId}:messages:update`
     res?.socket?.server?.io?.emit(updateKey, messageWithMemberAndProfile)

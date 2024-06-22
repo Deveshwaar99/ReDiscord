@@ -6,6 +6,7 @@ import type { NextApiRequest } from 'next'
 import { z } from 'zod'
 import type { NextApiResponseServerIo } from '../io'
 import type { MessageWithMemberAndProfile } from '../../../../../types'
+import { createMessageObject } from '@/lib/utils'
 
 const querySchema = z.object({
   serverId: z.string().length(12, { message: 'Invalid serverId' }),
@@ -58,19 +59,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
       .returning()
       .then(res => res[0])
 
-    const messageWithMemberAndProfile: MessageWithMemberAndProfile = {
-      messageId: message.id,
-      content: message.content,
-      fileUrl: message.fileUrl,
-      deleted: message.deleted,
-      createdAt: message.createdAt,
-      updatedAt: message.updatedAt,
-      channelId: query.channelId,
-      memberId: serverWithMember.member.id,
-      memberRole: serverWithMember.member.role,
-      profileName: profile.name,
-      profileImage: profile.imageUrl,
-    }
+    const messageWithMemberAndProfile: MessageWithMemberAndProfile = createMessageObject({
+      message,
+      member: serverWithMember.member,
+      profile,
+    })
     const channelKey = `chat:${query.channelId}:messages`
     res?.socket?.server?.io?.emit(channelKey, messageWithMemberAndProfile)
 
