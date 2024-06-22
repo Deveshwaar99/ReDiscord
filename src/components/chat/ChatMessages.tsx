@@ -78,7 +78,7 @@ function ChatMessages({
   if (data) {
     return (
       <div ref={chatRef} className="flex flex-1 flex-col overflow-y-auto">
-        {!hasNextPage && <div className="flex-1 bg-white" />}
+        {!hasNextPage && <div className="flex-1" />}
         {!hasNextPage && <ChatWelcome type={type} name={name} />}
         {hasNextPage && (
           <div className="flex items-center justify-center">
