@@ -26,7 +26,6 @@ export type MessageWithMemberAndProfile = {
   deleted: boolean
   createdAt: Date
   updatedAt: Date
-  channelId: string
   memberId: string
   memberRole: 'ADMIN' | 'MODERATOR' | 'GUEST'
   profileName: string
