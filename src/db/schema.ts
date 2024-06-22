@@ -38,7 +38,7 @@ export const Profile = pgTable(
     return {
       clerkIdx: uniqueIndex('clerk_idx').on(table.clerkId),
     }
-  }
+  },
 )
 
 // Server Table
@@ -67,7 +67,7 @@ export const Server = pgTable(
     return {
       profileIdx: index('server_profile_idx').on(table.profileId),
     }
-  }
+  },
 )
 
 // Member Table
@@ -93,7 +93,7 @@ export const Member = pgTable(
   table => ({
     profileIdIndex: index('member_profileId_idx').on(table.profileId),
     serverIdIndex: index('member_serverId_idx').on(table.serverId),
-  })
+  }),
 )
 
 // Channel Relations
@@ -121,7 +121,7 @@ export const Channel = pgTable(
   table => ({
     serverIdIndex: index('channel_serverId_idx').on(table.serverId),
     memberIdIndex: index('channel_memberId_idx').on(table.memberId),
-  })
+  }),
 )
 
 // Message Table
@@ -147,7 +147,7 @@ export const Message = pgTable(
   table => ({
     memberIdx: index().on(table.memberId),
     channelIdx: index().on(table.channelId),
-  })
+  }),
 )
 
 // Conversation Table
@@ -171,7 +171,7 @@ export const Conversation = pgTable(
   table => ({
     membersUnique: unique().on(table.memberOneId, table.memberTwoId),
     membersCompositeIdx: index('members_composite_idx').on(table.memberOneId, table.memberTwoId),
-  })
+  }),
 )
 
 // DirectMessage Table
