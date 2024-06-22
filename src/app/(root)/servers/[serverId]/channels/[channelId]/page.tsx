@@ -21,25 +21,20 @@ async function ChannelPage({ params }: ChannelPageProps) {
     return redirectToSignIn()
   }
 
-  const member = await db
+  const memberAndChannel = await db
     .select()
     .from(Member)
-    .where(and(eq(Member.serverId, params.serverId), eq(Member.profileId, profile.id)))
+    .where(and(eq(Member.profileId, profile.id), eq(Member.serverId, params.serverId)))
+    .innerJoin(
+      Channel,
+      and(eq(Channel.serverId, params.serverId), eq(Channel.id, params.channelId)),
+    )
     .then(res => res[0])
 
-  if (!member) {
+  if (!memberAndChannel) {
     redirect('/')
   }
-
-  const channel = await db
-    .select()
-    .from(Channel)
-    .where(and(eq(Channel.serverId, params.serverId), eq(Channel.id, params.channelId)))
-    .then(res => res[0])
-
-  if (!channel) {
-    redirect('/')
-  }
+  const { member, channel } = memberAndChannel
 
   return (
     <div className="flex h-full flex-col bg-white dark:bg-[#313338]">
