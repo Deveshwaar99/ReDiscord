@@ -7,6 +7,7 @@ import { getProfile } from '@/lib/getProfile'
 import { redirectToSignIn } from '@clerk/nextjs'
 import { and, eq } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
+import { ChannelTypes } from '../../../../../../../types'
 
 interface ChannelPageProps {
   params: {
@@ -45,17 +46,21 @@ async function ChannelPage({ params }: ChannelPageProps) {
         // imageUrl={profile.imageUrl}
       />
 
-      <ChatMessages
-        apiUrl={`/api/servers/${params.serverId}/channels/${params.channelId}/messages`}
-        chatId={channel.id}
-        name={channel.name}
-        type="channel"
-        member={member}
-        paramKey="channelId"
-        paramValue={channel.id}
-        socketUrl="/api/socket/messages"
-        socketQuery={{ serverId: params.serverId, channelId: params.channelId }}
-      />
+      {channel.type === ChannelTypes.TEXT && (
+        <ChatMessages
+          apiUrl={`/api/servers/${params.serverId}/channels/${params.channelId}/messages`}
+          chatId={channel.id}
+          name={channel.name}
+          type="channel"
+          member={member}
+          paramKey="channelId"
+          paramValue={channel.id}
+          socketUrl="/api/socket/messages"
+          socketQuery={{ serverId: params.serverId, channelId: params.channelId }}
+        />
+      )}
+      {channel.type === ChannelTypes.AUDIO && <></>}
+      {channel.type === ChannelTypes.VIDEO && <></>}
 
       <ChatInput
         name={channel.name}
