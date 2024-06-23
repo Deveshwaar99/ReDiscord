@@ -1,3 +1,4 @@
+import MediaRoom from '@/components/MediaRoom'
 import ChatHeader from '@/components/chat/ChatHeader'
 import ChatInput from '@/components/chat/ChatInput'
 import ChatMessages from '@/components/chat/ChatMessages'
@@ -9,7 +10,12 @@ import { redirectToSignIn } from '@clerk/nextjs'
 import { and, eq } from 'drizzle-orm'
 import { notFound, redirect } from 'next/navigation'
 
-async function MemberIdPage({ params }: { params: { serverId: string; memberId: string } }) {
+interface MemberIdPageProps {
+  params: { serverId: string; memberId: string }
+  searchParams: { video?: boolean }
+}
+
+async function MemberIdPage({ params, searchParams }: MemberIdPageProps) {
   const profile = await getProfile()
   if (!profile) {
     return redirectToSignIn()
@@ -51,33 +57,40 @@ async function MemberIdPage({ params }: { params: { serverId: string; memberId: 
         imageUrl={memberTwo.profile.imageUrl}
         type="conversation"
       />
-      <ChatMessages
-        apiUrl={`/api/servers/${params.serverId}/conversation/${params.memberId}/direct-messages`}
-        chatId={conversation.id}
-        name={memberTwo.profile.name}
-        type="conversation"
-        member={memberOne}
-        paramKey="conversationId"
-        paramValue={conversation.id}
-        socketUrl="/api/socket/direct-messages"
-        socketQuery={{
-          serverId: params.serverId,
-          conversationId: conversation.id,
-          memberOneId: memberOne.id,
-          memberTwoId: memberTwo.id,
-        }}
-      />
-      <ChatInput
-        name={memberTwo.profile.name}
-        type="conversation"
-        socketUrl="/api/socket/direct-messages"
-        socketQuery={{
-          serverId: params.serverId,
-          conversationId: conversation.id,
-          memberOneId: memberOne.id,
-          memberTwoId: memberTwo.id,
-        }}
-      />
+
+      {searchParams.video ? (
+        <MediaRoom chatId={conversation.id} audio={true} video={true} />
+      ) : (
+        <>
+          <ChatMessages
+            apiUrl={`/api/servers/${params.serverId}/conversation/${params.memberId}/direct-messages`}
+            chatId={conversation.id}
+            name={memberTwo.profile.name}
+            type="conversation"
+            member={memberOne}
+            paramKey="conversationId"
+            paramValue={conversation.id}
+            socketUrl="/api/socket/direct-messages"
+            socketQuery={{
+              serverId: params.serverId,
+              conversationId: conversation.id,
+              memberOneId: memberOne.id,
+              memberTwoId: memberTwo.id,
+            }}
+          />
+          <ChatInput
+            name={memberTwo.profile.name}
+            type="conversation"
+            socketUrl="/api/socket/direct-messages"
+            socketQuery={{
+              serverId: params.serverId,
+              conversationId: conversation.id,
+              memberOneId: memberOne.id,
+              memberTwoId: memberTwo.id,
+            }}
+          />
+        </>
+      )}
     </div>
   )
 }
