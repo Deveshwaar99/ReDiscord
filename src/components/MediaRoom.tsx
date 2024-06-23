@@ -5,7 +5,7 @@ interface MediaRoomProps {
   audio: boolean
   video: boolean
 }
-function MediaRoom() {
+function MediaRoom({ chatId, audio, video }: MediaRoomProps) {
   return <div>MediaRoom</div>
 }
 
