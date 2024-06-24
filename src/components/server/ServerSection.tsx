@@ -1,7 +1,7 @@
 'use client'
 import { useModalStore } from '@/hooks/useModalStore'
 import { Plus, Settings } from 'lucide-react'
-import { ChannelTypes, MemberRoles, ServerDetails } from '../../../types'
+import type { ChannelTypes, MemberRoles, ServerDetails } from '../../../types'
 import ActionTooltip from '../ActionTooltip'
 
 type ServerSectionProps = {
@@ -21,6 +21,7 @@ function ServerSection({ label, sectionType, channelType, role, server }: Server
       {role !== 'GUEST' && sectionType === 'channels' && (
         <ActionTooltip label="Create Channel" side="top">
           <button
+            type="button"
             onClick={() => {
               onOpen('create-channel', { server, channelType: channelType })
             }}
@@ -34,6 +35,7 @@ function ServerSection({ label, sectionType, channelType, role, server }: Server
       {role === 'ADMIN' && sectionType === 'members' && (
         <ActionTooltip label="Manage Members" side="top">
           <button
+            type="button"
             onClick={() => {
               onOpen('manage-members', { server })
             }}

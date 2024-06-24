@@ -1,12 +1,12 @@
 'use client'
 
-import { SelectChannel, SelectServer } from '@/db/schema'
+import type { SelectChannel, SelectServer } from '@/db/schema'
 import { useModalStore } from '@/hooks/useModalStore'
 import { cn } from '@/lib/utils'
-import { Edit, Hash, Lock, LucideIcon, Mic, Trash, Video } from 'lucide-react'
+import { Edit, Hash, Lock, type LucideIcon, Mic, Trash, Video } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
-import { MouseEvent } from 'react'
-import { ChannelTypes, MemberRoles } from '../../../types'
+import type { MouseEvent } from 'react'
+import type { ChannelTypes, MemberRoles } from '../../../types'
 import ActionTooltip from '../ActionTooltip'
 
 type ServerChannelProps = {
@@ -39,18 +39,19 @@ function ServerChannel({ channel, server, role }: ServerChannelProps) {
   const Icon = iconMap[channel.type]
   return (
     <button
+      type="button"
       onClick={onClick}
       className={cn(
         'group mb-1 flex w-full items-center gap-x-2 rounded-md px-2 py-2 transition hover:bg-zinc-700/10 dark:hover:bg-zinc-700/50',
-        params?.channelId === channel.id ? ' bg-zinc-700/20 dark:bg-zinc-700' : undefined
+        params?.channelId === channel.id ? 'bg-zinc-700/20 dark:bg-zinc-700' : undefined,
       )}
     >
       <Icon className="h-5 w-5 flex-shrink-0 text-zinc-500 dark:text-zinc-400" />
 
       <p
         className={cn(
-          ' line-clamp-1 text-sm font-semibold text-zinc-500 transition group-hover:text-zinc-600 dark:text-zinc-400 dark:group-hover:text-zinc-300',
-          params?.channelId === channel.id ? 'text-primary dark:text-zinc-200' : undefined
+          'line-clamp-1 text-sm font-semibold text-zinc-500 transition group-hover:text-zinc-600 dark:text-zinc-400 dark:group-hover:text-zinc-300',
+          params?.channelId === channel.id ? 'text-primary dark:text-zinc-200' : undefined,
         )}
       >
         {channel.name}
