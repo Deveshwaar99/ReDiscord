@@ -1,3 +1,4 @@
+import MediaRoom from '@/components/MediaRoom'
 import ChatHeader from '@/components/chat/ChatHeader'
 import ChatInput from '@/components/chat/ChatInput'
 import ChatMessages from '@/components/chat/ChatMessages'
@@ -68,8 +69,13 @@ async function ChannelPage({ params }: ChannelPageProps) {
           />
         </>
       )}
-      {channel.type === ChannelTypes.AUDIO && <></>}
-      {channel.type === ChannelTypes.VIDEO && <></>}
+
+      {channel.type === ChannelTypes.AUDIO && (
+        <MediaRoom chatId={channel.id} audio={true} video={false} />
+      )}
+      {channel.type === ChannelTypes.VIDEO && (
+        <MediaRoom chatId={channel.id} audio={true} video={true} />
+      )}
     </div>
   )
 }
