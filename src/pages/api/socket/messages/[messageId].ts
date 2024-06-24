@@ -118,7 +118,6 @@ async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
 
     return res.status(200).send('OK')
   } catch (error) {
-    console.log(error)
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: error.flatten().fieldErrors })
     }
