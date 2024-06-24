@@ -65,8 +65,8 @@ function EditChannelModal() {
 
   useEffect(() => {
     if (channel) {
-      form.setValue('name', channel?.name!)
-      form.setValue('type', channel?.type!)
+      form.setValue('name', channel?.name)
+      form.setValue('type', channel?.type)
     }
   }, [form, channel])
 
