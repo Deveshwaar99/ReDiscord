@@ -4,7 +4,7 @@ import NavigationItem from '@/components/navigation/NavigationItem'
 import NavigiationAction from '@/components/navigation/NavigiationAction'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { db } from '@/db'
-import { Member, SelectServer, Server } from '@/db/schema'
+import { Member, Server, type SelectServer } from '@/db/schema'
 import { getProfile } from '@/lib/getProfile'
 import { UserButton, redirectToSignIn } from '@clerk/nextjs'
 import { asc, eq } from 'drizzle-orm'
@@ -23,17 +23,16 @@ async function NavigationSidebar() {
     .innerJoin(Server, eq(Server.id, Member.serverId))
     .orderBy(asc(Server.createdAt))
 
-  let ownedServers: SelectServer[] = []
-  let memberServers: SelectServer[] = []
+  const ownedServers: SelectServer[] = []
+  const memberServers: SelectServer[] = []
 
-  membersWithServers.forEach(({ member, server }) => {
+  for (const { member, server } of membersWithServers) {
     if (member.role === MemberRoles.ADMIN) {
       ownedServers.push(server)
     } else {
       memberServers.push(server)
     }
-  })
-
+  }
   const servers = [...ownedServers, ...memberServers]
   return (
     <div className="flex h-full w-full flex-col items-center space-y-4 bg-[#E3E5E8] py-3 text-primary dark:bg-[#1E1F22]">
