@@ -62,7 +62,7 @@ function DeleteChannelModal() {
               }}
               variant="primary"
             >
-              Confirm
+              {isPending ? 'Deleting Channel...' : 'Confirm'}
             </Button>
           </div>
         </DialogFooter>

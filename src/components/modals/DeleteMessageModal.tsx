@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/dialog'
 import { useModalStore } from '@/hooks/useModalStore'
 import axios from 'axios'
-import { Loader2 } from 'lucide-react'
 import queryString from 'query-string'
 import { useTransition } from 'react'
 import toast from 'react-hot-toast'
@@ -59,7 +58,7 @@ function DeleteMessageModal() {
               }}
               variant="primary"
             >
-              {isPending ? <Loader2 className="size-5 animate-spin" /> : 'Confirm'}
+              {isPending ? 'Deleting...' : 'Confirm'}
             </Button>
           </div>
         </DialogFooter>

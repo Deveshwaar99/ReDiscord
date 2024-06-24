@@ -150,7 +150,7 @@ function EditServerModal() {
                   disabled={isPending}
                   className="w-full bg-indigo-500 text-white hover:bg-indigo-500/90"
                 >
-                  Save
+                  {isPending ? 'Saving...' : 'Save'}
                 </Button>
               </DialogFooter>
             </div>

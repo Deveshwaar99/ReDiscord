@@ -64,7 +64,7 @@ function LeaveServerModal() {
               }}
               variant="primary"
             >
-              Confirm
+              {isPending ? 'Leaving...' : 'Confirm'}
             </Button>
           </div>
         </DialogFooter>

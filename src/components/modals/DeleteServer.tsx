@@ -62,7 +62,7 @@ function DeleteServerModal() {
               }}
               variant="primary"
             >
-              Confirm
+              {isPending ? 'Deleting Server...' : 'Create'}
             </Button>
           </div>
         </DialogFooter>

@@ -15,7 +15,6 @@ import { Form, FormControl, FormField, FormItem } from '@/components/ui/form'
 import { useModalStore } from '@/hooks/useModalStore'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
-import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import queryString from 'query-string'
 import { useTransition } from 'react'
@@ -104,7 +103,7 @@ function MessageFileModal() {
                   disabled={isPending}
                   className="w-full bg-indigo-500 text-white hover:bg-indigo-500/90"
                 >
-                  {isPending ? <Loader2 className="size-5 animate-spin" /> : 'Send'}
+                  {isPending ? 'Sending...' : 'Send'}
                 </Button>
               </DialogFooter>
             </div>
