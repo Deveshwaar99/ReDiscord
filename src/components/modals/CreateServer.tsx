@@ -55,7 +55,7 @@ function CreateServerModal() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      imageUrl: 'https://utfs.io/f/f9084c92-c855-4945-b8cb-8e9e8f663ec8-9394t8.jpg',
+      imageUrl: '',
     },
   })
 
