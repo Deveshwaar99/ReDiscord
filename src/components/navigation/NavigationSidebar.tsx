@@ -3,11 +3,10 @@ import { ThemeSwitch } from '@/components/ThemeSwitch'
 import NavigationItem from '@/components/navigation/NavigationItem'
 import NavigiationAction from '@/components/navigation/NavigiationAction'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { db } from '@/db'
-import { Member, Server, type SelectServer } from '@/db/schema'
+import type { SelectServer } from '@/db/schema'
+import { cachedGetMembersWithServers } from '@/lib/cachedGetMembersWithServers'
 import { getProfile } from '@/lib/getProfile'
 import { UserButton, redirectToSignIn } from '@clerk/nextjs'
-import { asc, eq } from 'drizzle-orm'
 import { MemberRoles } from '../../../types'
 
 async function NavigationSidebar() {
@@ -16,12 +15,7 @@ async function NavigationSidebar() {
     return redirectToSignIn()
   }
 
-  const membersWithServers = await db
-    .select()
-    .from(Member)
-    .where(eq(Member.profileId, profile.id))
-    .innerJoin(Server, eq(Server.id, Member.serverId))
-    .orderBy(asc(Server.createdAt))
+  const membersWithServers = await cachedGetMembersWithServers(profile)
 
   const ownedServers: SelectServer[] = []
   const memberServers: SelectServer[] = []
