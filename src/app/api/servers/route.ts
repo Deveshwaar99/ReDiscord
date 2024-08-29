@@ -2,7 +2,7 @@ import { db } from '@/db'
 import { Channel, Member, Server } from '@/db/schema'
 import { getProfile } from '@/lib/getProfile'
 import { verifyServerData } from '@/lib/utils'
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
   try {
