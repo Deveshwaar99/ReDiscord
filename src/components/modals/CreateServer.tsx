@@ -28,7 +28,10 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
 
-function CreateServerModal() {
+type CreateServerModalProps = {
+  forceOpen?: boolean
+}
+function CreateServerModal({ forceOpen }: CreateServerModalProps) {
   const [isPending, startTransition] = useTransition()
 
   const { isOpen, type, onClose } = useModalStore()
@@ -80,7 +83,7 @@ function CreateServerModal() {
   }
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={handleClose}>
+    <Dialog open={isModalOpen || forceOpen} onOpenChange={handleClose}>
       <DialogOverlay className="bg-transparent" />
       <DialogContent className="w-[440px] overflow-hidden border-none bg-white p-0 text-primary dark:bg-[#313338]">
         <DialogHeader className="px-6 pt-8">
