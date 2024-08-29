@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { db } from '@/db'
-import { Profile, SelectProfile } from '@/db/schema'
+import { Profile, type SelectProfile } from '@/db/schema'
 import { currentUser, redirectToSignIn } from '@clerk/nextjs'
 import { eq } from 'drizzle-orm'
 
