@@ -5,7 +5,7 @@ import ChatMessages from '@/components/chat/ChatMessages'
 import { db } from '@/db'
 import { Channel, Member } from '@/db/schema'
 import { getProfile } from '@/lib/getProfile'
-import { redirectToSignIn } from '@clerk/nextjs'
+import { auth } from '@clerk/nextjs/server'
 import { and, eq } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 import { ChannelTypes } from '../../../../../../../types'
@@ -19,9 +19,7 @@ interface ChannelPageProps {
 
 async function ChannelPage({ params }: ChannelPageProps) {
   const profile = await getProfile()
-  if (!profile) {
-    return redirectToSignIn()
-  }
+  if (!profile) return auth().redirectToSignIn()
 
   const memberAndChannel = await db
     .select()
@@ -29,7 +27,7 @@ async function ChannelPage({ params }: ChannelPageProps) {
     .where(and(eq(Member.profileId, profile.id), eq(Member.serverId, params.serverId)))
     .innerJoin(
       Channel,
-      and(eq(Channel.serverId, params.serverId), eq(Channel.id, params.channelId)),
+      and(eq(Channel.serverId, params.serverId), eq(Channel.id, params.channelId))
     )
     .then(res => res[0])
 

@@ -2,7 +2,7 @@ import ServerSidebar from '@/components/server/ServerSidebar'
 import { db } from '@/db'
 import { Member } from '@/db/schema'
 import { getProfile } from '@/lib/getProfile'
-import { redirectToSignIn } from '@clerk/nextjs'
+import { auth } from '@clerk/nextjs/server'
 import { eq } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 
@@ -14,7 +14,7 @@ async function ServerLayout({
   params: { serverId: string }
 }) {
   const profile = await getProfile()
-  if (!profile) return redirectToSignIn()
+  if (!profile) return auth().redirectToSignIn()
 
   const memberSql = db.select().from(Member).where(eq(Member.profileId, profile.id))
 

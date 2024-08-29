@@ -1,13 +1,13 @@
 import CreateServerModal from '@/components/modals/CreateServer'
 import { cachedGetMembersWithServers } from '@/lib/cachedGetMembersWithServers'
 import { getProfile } from '@/lib/getProfile'
-import { redirectToSignIn } from '@clerk/nextjs/server'
+import { auth } from '@clerk/nextjs/server'
 import { Loader } from 'lucide-react'
 
 export default async function Home() {
   const profile = await getProfile()
   if (!profile) {
-    return redirectToSignIn()
+    return auth().redirectToSignIn()
   }
   const membersWithServers = await cachedGetMembersWithServers(profile)
 

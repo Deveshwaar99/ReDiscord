@@ -1,7 +1,7 @@
 import { db } from '@/db'
 import { Channel } from '@/db/schema'
-import { currentUser } from '@clerk/nextjs'
-import { redirectToSignIn } from '@clerk/nextjs/server'
+import { getProfile } from '@/lib/getProfile'
+import { auth } from '@clerk/nextjs/server'
 import { and, eq } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 
@@ -10,11 +10,8 @@ interface ServerIdPageProps {
 }
 
 async function ServerIdPage({ params }: ServerIdPageProps) {
-  const user = await currentUser()
-
-  if (!user) {
-    return redirectToSignIn()
-  }
+  const profile = await getProfile()
+  if (!profile) return auth().redirectToSignIn()
 
   const generalChannel = await db
     .select()

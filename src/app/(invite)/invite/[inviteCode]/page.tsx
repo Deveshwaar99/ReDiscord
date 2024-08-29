@@ -1,7 +1,7 @@
 import { db } from '@/db'
 import { Member } from '@/db/schema'
 import { getProfile } from '@/lib/getProfile'
-import { redirectToSignIn } from '@clerk/nextjs/server'
+import { auth } from '@clerk/nextjs/server'
 import { and } from 'drizzle-orm'
 import { notFound, redirect } from 'next/navigation'
 
@@ -9,7 +9,7 @@ async function InvitePage({ params }: { params: { inviteCode: string } }) {
   const { inviteCode } = params
   // const decodedInviteCode = decodeURIComponent(inviteCode)
   const profile = await getProfile()
-  if (!profile) return redirectToSignIn()
+  if (!profile) return auth().redirectToSignIn()
   if (!inviteCode) {
     return redirect('/')
   }

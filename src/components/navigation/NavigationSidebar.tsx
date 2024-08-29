@@ -6,13 +6,14 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import type { SelectServer } from '@/db/schema'
 import { cachedGetMembersWithServers } from '@/lib/cachedGetMembersWithServers'
 import { getProfile } from '@/lib/getProfile'
-import { UserButton, redirectToSignIn } from '@clerk/nextjs'
+import { UserButton } from '@clerk/nextjs'
+import { auth } from '@clerk/nextjs/server'
 import { MemberRoles } from '../../../types'
 
 async function NavigationSidebar() {
   const profile = await getProfile()
   if (!profile) {
-    return redirectToSignIn()
+    return auth().redirectToSignIn()
   }
 
   const membersWithServers = await cachedGetMembersWithServers(profile)
@@ -42,7 +43,7 @@ async function NavigationSidebar() {
       <div className="mt-auto flex flex-col items-center gap-y-4 pb-3">
         <ThemeSwitch />
         <UserButton
-          afterSignOutUrl="/"
+          // afterSignOutUrl="/"
           appearance={{
             elements: {
               avatarBox: 'w-[44px] h-[44px]',
