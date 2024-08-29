@@ -1,7 +1,8 @@
 import NavigationSidebar from '@/components/navigation/NavigationSidebar'
-import React from 'react'
 
-async function MainLayout({ children }: { children: React.ReactNode }) {
+import type { PropsWithChildren } from 'react'
+
+async function MainLayout({ children }: PropsWithChildren) {
   return (
     <div className="h-full">
       <div className="fixed inset-y-0 z-30 hidden h-full w-[72px] flex-col md:flex">
