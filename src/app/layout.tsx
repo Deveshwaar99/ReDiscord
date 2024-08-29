@@ -22,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider afterSignOutUrl={process.env.NEXT_PUBLIC_SITE_URL}>
       <html lang="en">
         <body className={cn(font.className, 'bg-white dark:bg-[#313338] antialiased')}>
           <ThemeProvider
