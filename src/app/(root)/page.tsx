@@ -18,7 +18,7 @@ export default async function Home() {
     <div className="flex h-full flex-col items-center justify-center space-y-4">
       <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-200 flex flex-col items-center justify-center">
         <p>
-          I'm working on something exciting !<br />
+          I&apos;m working on something exciting !<br />
         </p>
         <p>Click on a server to explore.</p>
       </h1>
