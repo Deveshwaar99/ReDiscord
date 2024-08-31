@@ -6,7 +6,7 @@ import { db } from '@/db'
 import { Member } from '@/db/schema'
 import { getOrCreateConversation } from '@/lib/conversations'
 import { getProfile } from '@/lib/getProfile'
-import { redirectToSignIn } from '@clerk/nextjs'
+import { auth } from '@clerk/nextjs/server'
 import { and, eq } from 'drizzle-orm'
 import { notFound, redirect } from 'next/navigation'
 
@@ -18,7 +18,7 @@ interface MemberIdPageProps {
 async function MemberIdPage({ params, searchParams }: MemberIdPageProps) {
   const profile = await getProfile()
   if (!profile) {
-    return redirectToSignIn()
+    return auth().redirectToSignIn()
   }
 
   // CHECK - LoggedIn user is a valid member of the server
