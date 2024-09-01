@@ -12,8 +12,8 @@ import './globals.css'
 const font = Open_Sans({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'DISCORDME',
-  description: 'VIDEO CHAT APP',
+  title: 'Re-Discord',
+  description: 'Chat and video communication app.',
 }
 
 export default function RootLayout({
