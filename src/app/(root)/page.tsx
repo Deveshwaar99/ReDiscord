@@ -18,9 +18,10 @@ export default async function Home() {
     <div className="flex h-full flex-col items-center justify-center space-y-4">
       <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-200 flex flex-col items-center justify-center">
         <p>
-          I&apos;m working on something exciting !<br />
+          I&apos;m currently working on the design of this page!
+          <br />
         </p>
-        <p>Click on a server to explore.</p>
+        <p>In the meantime, feel free to explore by clicking on a server on the left.</p>
       </h1>
       <Loader className="animate-spin text-gray-600 dark:text-gray-400 h-8 w-8" />
     </div>
