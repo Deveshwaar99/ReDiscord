@@ -7,7 +7,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-[🌐 Live Demo](https://rediscord-production.up.railway.app/) | [🐛 Report Bug](https://github.com/Deveshwaar99/rediscord/issues)
+[🌐 Live Demo](https://rediscord-03se.onrender.com/) | [🐛 Report Bug](https://github.com/Deveshwaar99/rediscord/issues)
 
 ## ✨ Features
 
